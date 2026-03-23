@@ -1,0 +1,75 @@
+package com.ejemplo.myapp.ui.screens
+
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.ejemplo.myapp.ui.components.*
+import com.ejemplo.myapp.ui.theme.*
+
+@Composable
+fun SignupScreen(onSignupSuccess: () -> Unit, onBack: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(BrightPink)
+            .padding(16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Card(
+            modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+            shape = RoundedCornerShape(32.dp),
+            colors = CardDefaults.cardColors(containerColor = Background)
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = null, tint = BrightLime)
+                    }
+                    Text(
+                        text = "Join the Tree", 
+                        fontSize = 24.sp, 
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(32.dp))
+                
+                AppTextField(label = "FULL NAME", placeholder = "John Appleseed")
+                Spacer(modifier = Modifier.height(16.dp))
+                AppTextField(label = "EMAIL", placeholder = "fruity@man.com")
+                Spacer(modifier = Modifier.height(16.dp))
+                AppTextField(label = "PASSWORD", placeholder = "••••••••", isPassword = true)
+                
+                Spacer(modifier = Modifier.height(32.dp))
+                
+                AppButton(
+                    text = "PLANT MY SEED", 
+                    onClick = onSignupSuccess,
+                    containerColor = BrightPink
+                )
+                
+                Spacer(modifier = Modifier.height(24.dp))
+                
+                Text(
+                    text = "By signing up, you agree to become 100% natural fruit.",
+                    fontSize = 10.sp,
+                    color = OnSurfaceVariant,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+            }
+        }
+    }
+}
