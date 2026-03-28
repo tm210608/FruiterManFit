@@ -1,17 +1,16 @@
 package com.ejemplo.myapp.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.ejemplo.myapp.ui.screens.*
-import com.ejemplo.myapp.ui.viewmodels.FitnessViewModelFactory
+import com.ejemplo.myapp.ui.viewmodels.*
 
 @Composable
 fun SetupNavGraph(
-    navController: NavHostController,
-    factory: FitnessViewModelFactory
+    navController: NavHostController
 ) {
     NavHost(
         navController = navController,
@@ -45,21 +44,24 @@ fun SetupNavGraph(
             )
         }
         composable(Screen.Home.route) {
+            val viewModel: DashboardViewModel = hiltViewModel()
             DashboardScreen(
-                viewModel = viewModel(factory = factory),
+                viewModel = viewModel,
                 onLaunchWorkout = { navController.navigate(Screen.Session.route) },
                 onSeeAllPlans = { navController.navigate(Screen.Plans.route) }
             )
         }
         composable(Screen.Plans.route) {
+            val viewModel: ExerciseLibraryViewModel = hiltViewModel()
             ExerciseLibraryScreen(
-                onExerciseClick = { /* Ver detalle si quieres */ },
-                viewModel = viewModel(factory = factory)
+                onExerciseClick = { /* Detalle */ },
+                viewModel = viewModel
             )
         }
         composable(Screen.Session.route) {
+            val viewModel: WorkoutSessionViewModel = hiltViewModel()
             WorkoutLogScreen(
-                viewModel = viewModel(factory = factory),
+                viewModel = viewModel,
                 onFinish = {
                     navController.navigate(Screen.Home.route) {
                         popUpTo(Screen.Session.route) { inclusive = true }
@@ -72,9 +74,10 @@ fun SetupNavGraph(
             SocialScreen()
         }
         composable(Screen.Profile.route) {
+            val viewModel: ProfileViewModel = hiltViewModel()
             ProfileScreen(
                 onSettingsClick = { navController.navigate(Screen.Settings.route) },
-                viewModel = viewModel(factory = factory)
+                viewModel = viewModel
             )
         }
         composable(Screen.Settings.route) {
