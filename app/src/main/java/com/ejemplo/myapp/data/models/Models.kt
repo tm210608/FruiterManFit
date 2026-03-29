@@ -1,7 +1,6 @@
 package com.ejemplo.myapp.data.models
 
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 
 data class Workout(
     val id: String,
@@ -14,8 +13,12 @@ data class Workout(
 data class Exercise(
     val id: String,
     val name: String,
-    val level: String,
-    val category: String,
+    val bodyPart: String,
+    val equipment: String,
+    val gifUrl: String,
+    val target: String,
+    val secondaryMuscles: List<String>,
+    val instructions: List<String>,
     val accentColor: Color? = null
 )
 
@@ -39,5 +42,6 @@ data class ActiveExercise(
     val name: String,
     val subtitle: String,
     val accentColor: Color,
-    val sets: List<SessionSet>
+    val sets: List<SessionSet>,
+    val gifUrl: String = ""
 )

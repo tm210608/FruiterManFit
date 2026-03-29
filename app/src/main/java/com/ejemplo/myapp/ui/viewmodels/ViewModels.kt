@@ -82,17 +82,28 @@ class ExerciseLibraryViewModel @Inject constructor(
 class WorkoutSessionViewModel @Inject constructor(
     private val repository: FitnessRepository
 ) : ViewModel() {
-    private val _activeExercises = MutableStateFlow<List<ActiveExercise>>(
-        listOf(
-            ActiveExercise(
-                "1", "Bench Press", "Chest", BrightBlue,
-                listOf(SessionSet(1, "80", "10", false))
-            )
-        )
-    )
+    private val _activeExercises = MutableStateFlow<List<ActiveExercise>>(emptyList())
     val activeExercises: StateFlow<List<ActiveExercise>> = _activeExercises
 
     private val _startTime = System.currentTimeMillis()
+
+    fun addExerciseById(exerciseId: String) {
+        viewModelScope.launch {
+            val allExercises = repository.getExercises().first()
+            val exercise = allExercises.find { it.id == exerciseId }
+            
+            exercise?.let {
+                val newActiveExercise = ActiveExercise(
+                    exerciseId = it.id,
+                    name = it.name,
+                    subtitle = it.category,
+                    accentColor = it.accentColor ?: BrightBlue,
+                    sets = listOf(SessionSet(1, "0", "0", false))
+                )
+                _activeExercises.value = _activeExercises.value + newActiveExercise
+            }
+        }
+    }
 
     fun addSet(exerciseId: String) {
         val currentList = _activeExercises.value.toMutableList()
@@ -122,12 +133,14 @@ class WorkoutSessionViewModel @Inject constructor(
     }
 
     fun finishWorkout(onComplete: () -> Unit) {
+        if (_activeExercises.value.isEmpty()) {
+            onComplete()
+            return
+        }
         viewModelScope.launch {
             val duration = System.currentTimeMillis() - _startTime
-            // Cálculo básico de calorías: 250 cal por sesión por ahora.
-            // Más adelante podemos basarlo en el volumen total (sets * reps * weight)
             repository.saveWorkoutSession(
-                title = "Morning Muscle Burn 🔥",
+                title = "Custom Workout",
                 durationMillis = duration,
                 calories = 250,
                 activeExercises = _activeExercises.value

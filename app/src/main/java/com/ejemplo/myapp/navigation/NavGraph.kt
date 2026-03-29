@@ -12,6 +12,10 @@ import com.ejemplo.myapp.ui.viewmodels.*
 fun SetupNavGraph(
     navController: NavHostController
 ) {
+    // Compartimos el WorkoutSessionViewModel para que persista mientras dura la sesión
+    // y para que la pantalla de selección pueda añadirle ejercicios
+    val sessionViewModel: WorkoutSessionViewModel = hiltViewModel()
+
     NavHost(
         navController = navController,
         startDestination = Screen.Splash.route
@@ -54,20 +58,26 @@ fun SetupNavGraph(
         composable(Screen.Plans.route) {
             val viewModel: ExerciseLibraryViewModel = hiltViewModel()
             ExerciseLibraryScreen(
-                onExerciseClick = { /* Detalle */ },
+                onExerciseClick = { exerciseId -> 
+                    // Si venimos de la sesión, añadimos el ejercicio y volvemos
+                    sessionViewModel.addExerciseById(exerciseId)
+                    navController.popBackStack()
+                },
                 viewModel = viewModel
             )
         }
         composable(Screen.Session.route) {
-            val viewModel: WorkoutSessionViewModel = hiltViewModel()
             WorkoutLogScreen(
-                viewModel = viewModel,
+                viewModel = sessionViewModel,
                 onFinish = {
                     navController.navigate(Screen.Home.route) {
                         popUpTo(Screen.Session.route) { inclusive = true }
                     }
                 },
-                onAddExercise = { navController.navigate(Screen.Plans.route) }
+                onAddExercise = { 
+                    // Vamos a la librería pero con la intención de seleccionar uno
+                    navController.navigate(Screen.Plans.route) 
+                }
             )
         }
         composable(Screen.Social.route) {
