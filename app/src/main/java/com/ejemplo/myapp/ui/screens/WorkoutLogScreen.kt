@@ -21,14 +21,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ejemplo.myapp.ui.theme.*
 import com.ejemplo.myapp.ui.viewmodels.WorkoutSessionViewModel
 import com.ejemplo.myapp.ui.components.AppButton
 
 @Composable
 fun WorkoutLogScreen(
-    viewModel: WorkoutSessionViewModel = viewModel(),
+    viewModel: WorkoutSessionViewModel,
     onFinish: () -> Unit,
     onAddExercise: () -> Unit
 ) {
@@ -90,7 +89,13 @@ fun WorkoutLogScreen(
         
         AppButton(text = "+ ADD EXERCISE", onClick = onAddExercise, containerColor = Surface)
         Spacer(modifier = Modifier.height(16.dp))
-        AppButton(text = "FINISH WORKOUT", onClick = onFinish, containerColor = BrightLime)
+        AppButton(
+            text = "FINISH WORKOUT", 
+            onClick = {
+                viewModel.finishWorkout(onComplete = onFinish)
+            }, 
+            containerColor = BrightLime
+        )
 
         Spacer(modifier = Modifier.height(120.dp))
     }

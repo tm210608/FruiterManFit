@@ -16,14 +16,25 @@ class DashboardViewModel @Inject constructor(
     private val repository: FitnessRepository
 ) : ViewModel() {
     val workout: StateFlow<Workout> = MutableStateFlow(repository.getTodaysWorkout())
-    val stats: StateFlow<UserStats> = MutableStateFlow(repository.getUserStats())
+    
+    val stats: StateFlow<UserStats> = repository.getRealUserStats()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = UserStats(1, "Fresh Fruit", 0, "0", 0)
+        )
 }
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val repository: FitnessRepository
 ) : ViewModel() {
-    val stats: StateFlow<UserStats> = MutableStateFlow(repository.getUserStats())
+    val stats: StateFlow<UserStats> = repository.getRealUserStats()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = UserStats(1, "Fresh Fruit", 0, "0", 0)
+        )
 }
 
 @HiltViewModel
@@ -81,6 +92,8 @@ class WorkoutSessionViewModel @Inject constructor(
     )
     val activeExercises: StateFlow<List<ActiveExercise>> = _activeExercises
 
+    private val _startTime = System.currentTimeMillis()
+
     fun addSet(exerciseId: String) {
         val currentList = _activeExercises.value.toMutableList()
         val index = currentList.indexOfFirst { it.exerciseId == exerciseId }
@@ -108,7 +121,18 @@ class WorkoutSessionViewModel @Inject constructor(
         }
     }
 
-    fun finishWorkout() {
-        // Lógica para guardar la sesión usando un UseCase (pendiente crear)
+    fun finishWorkout(onComplete: () -> Unit) {
+        viewModelScope.launch {
+            val duration = System.currentTimeMillis() - _startTime
+            // Cálculo básico de calorías: 250 cal por sesión por ahora.
+            // Más adelante podemos basarlo en el volumen total (sets * reps * weight)
+            repository.saveWorkoutSession(
+                title = "Morning Muscle Burn 🔥",
+                durationMillis = duration,
+                calories = 250,
+                activeExercises = _activeExercises.value
+            )
+            onComplete()
+        }
     }
 }

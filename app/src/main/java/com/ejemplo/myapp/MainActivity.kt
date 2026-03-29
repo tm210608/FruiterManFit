@@ -13,8 +13,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -22,8 +20,9 @@ import androidx.navigation.compose.rememberNavController
 import com.ejemplo.myapp.navigation.Screen
 import com.ejemplo.myapp.navigation.SetupNavGraph
 import com.ejemplo.myapp.ui.theme.*
-import com.ejemplo.myapp.ui.viewmodels.FitnessViewModelFactory
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,10 +36,6 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainContainer() {
-    val context = LocalContext.current
-    val app = context.applicationContext as FitnessApplication
-    val factory = FitnessViewModelFactory(app.repository)
-    
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -62,7 +57,7 @@ fun MainContainer() {
         containerColor = Background
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
-            SetupNavGraph(navController = navController, factory = factory)
+            SetupNavGraph(navController = navController)
         }
     }
 }
