@@ -48,14 +48,25 @@ class ExerciseLibraryViewModel @Inject constructor(
     private val _selectedFilter = MutableStateFlow("All")
     val selectedFilter: StateFlow<String> = _selectedFilter
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
     val exercises: StateFlow<List<Exercise>> = combine(
         getExercisesUseCase(),
         _searchQuery,
         _selectedFilter
     ) { list, query, filter ->
-        list.filter { 
-            (filter == "All" || it.category == filter) &&
-            (query.isEmpty() || it.name.contains(query, ignoreCase = true))
+        list.filter { exercise ->
+            val matchesFilter = if (filter == "All") {
+                true
+            } else {
+                // Comparamos ignorando mayúsculas/minúsculas y espacios
+                exercise.bodyPart.replace(" ", "").equals(filter.replace(" ", ""), ignoreCase = true)
+            }
+            
+            val matchesQuery = query.isEmpty() || exercise.name.contains(query, ignoreCase = true)
+            
+            matchesFilter && matchesQuery
         }
     }.stateIn(
         scope = viewModelScope,
@@ -71,12 +82,19 @@ class ExerciseLibraryViewModel @Inject constructor(
         _selectedFilter.value = filter
     }
 
-    init {
+    fun refreshExercises(apiKey: String) {
         viewModelScope.launch {
-            repository.refreshExercises()
+            _isLoading.value = true
+            repository.refreshExercises(apiKey)
+            _isLoading.value = false
         }
     }
 }
+
+@HiltViewModel
+class ExerciseDetailViewModel @Inject constructor(
+    val repository: FitnessRepository
+) : ViewModel()
 
 @HiltViewModel
 class WorkoutSessionViewModel @Inject constructor(
@@ -96,9 +114,10 @@ class WorkoutSessionViewModel @Inject constructor(
                 val newActiveExercise = ActiveExercise(
                     exerciseId = it.id,
                     name = it.name,
-                    subtitle = it.category,
+                    subtitle = it.bodyPart,
                     accentColor = it.accentColor ?: BrightBlue,
-                    sets = listOf(SessionSet(1, "0", "0", false))
+                    sets = listOf(SessionSet(1, "0", "0", false)),
+                    gifUrl = it.gifUrl
                 )
                 _activeExercises.value = _activeExercises.value + newActiveExercise
             }

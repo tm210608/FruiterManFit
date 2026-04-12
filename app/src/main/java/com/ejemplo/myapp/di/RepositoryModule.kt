@@ -1,6 +1,7 @@
 package com.ejemplo.myapp.di
 
 import com.ejemplo.myapp.data.local.dao.FitnessDao
+import com.ejemplo.myapp.data.remote.ExerciseApiService
 import com.ejemplo.myapp.data.repository.FitnessRepository
 import dagger.Module
 import dagger.Provides
@@ -14,7 +15,10 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideFitnessRepository(fitnessDao: FitnessDao): FitnessRepository {
-        return FitnessRepository(fitnessDao)
+    fun provideFitnessRepository(
+        fitnessDao: FitnessDao,
+        exerciseApiService: ExerciseApiService
+    ): FitnessRepository {
+        return FitnessRepository(fitnessDao, exerciseApiService)
     }
 }

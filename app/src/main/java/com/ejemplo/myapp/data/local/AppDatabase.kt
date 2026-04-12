@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import com.ejemplo.myapp.data.local.converters.StringListConverter
 import com.ejemplo.myapp.data.local.dao.FitnessDao
 import com.ejemplo.myapp.data.local.entities.*
 
@@ -14,9 +16,10 @@ import com.ejemplo.myapp.data.local.entities.*
         SessionExerciseEntity::class,
         ExerciseSetEntity::class
     ],
-    version = 1,
+    version = 2, // Subimos a la versión 2
     exportSchema = false
 )
+@TypeConverters(StringListConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun fitnessDao(): FitnessDao
 
@@ -30,7 +33,9 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "fruiterman_database"
-                ).build()
+                )
+                .fallbackToDestructiveMigration() // Esto evita que la app se cierre si cambias el esquema
+                .build()
                 INSTANCE = instance
                 instance
             }

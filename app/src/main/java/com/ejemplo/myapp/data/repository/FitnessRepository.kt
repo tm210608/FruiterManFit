@@ -6,8 +6,10 @@ import com.ejemplo.myapp.data.local.entities.*
 import com.ejemplo.myapp.data.models.*
 import com.ejemplo.myapp.data.remote.ExerciseApiService
 import com.ejemplo.myapp.data.remote.ExerciseDto
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class FitnessRepository @Inject constructor(
@@ -27,7 +29,7 @@ class FitnessRepository @Inject constructor(
     }
 
     // Fetch from ExerciseDB API and Save to Local DB
-    suspend fun refreshExercises(apiKey: String) {
+    suspend fun refreshExercises(apiKey: String) = withContext(Dispatchers.IO) {
         Log.d("FruiterMan", "Iniciando descarga incremental por categorías...")
         try {
             // 1. Obtener lista de partes del cuerpo

@@ -12,6 +12,9 @@ interface FitnessDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertExercises(exercises: List<ExerciseEntity>)
 
+    @Query("SELECT * FROM exercises WHERE id = :exerciseId LIMIT 1")
+    suspend fun getExerciseById(exerciseId: String): ExerciseEntity?
+
     @Query("SELECT * FROM workout_sessions ORDER BY startTime DESC")
     fun getAllSessions(): Flow<List<WorkoutSessionEntity>>
 

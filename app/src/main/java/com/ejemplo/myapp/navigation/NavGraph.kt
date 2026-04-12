@@ -3,8 +3,11 @@ package com.ejemplo.myapp.navigation
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+import com.ejemplo.myapp.data.repository.FitnessRepository
 import com.ejemplo.myapp.ui.screens.*
 import com.ejemplo.myapp.ui.viewmodels.*
 
@@ -58,12 +61,23 @@ fun SetupNavGraph(
         composable(Screen.Plans.route) {
             val viewModel: ExerciseLibraryViewModel = hiltViewModel()
             ExerciseLibraryScreen(
-                onExerciseClick = { exerciseId -> 
-                    // Si venimos de la sesión, añadimos el ejercicio y volvemos
-                    sessionViewModel.addExerciseById(exerciseId)
-                    navController.popBackStack()
+                onExerciseClick = { exerciseId ->
+                    navController.navigate(Screen.ExerciseDetail.createRoute(exerciseId))
                 },
                 viewModel = viewModel
+            )
+        }
+        composable(
+            route = Screen.ExerciseDetail.route,
+            arguments = listOf(navArgument("exerciseId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val exerciseId = backStackEntry.arguments?.getString("exerciseId") ?: ""
+            val detailViewModel: ExerciseDetailViewModel = hiltViewModel()
+            
+            ExerciseDetailScreen(
+                exerciseId = exerciseId,
+                repository = detailViewModel.repository,
+                onBack = { navController.popBackStack() }
             )
         }
         composable(Screen.Session.route) {
@@ -75,9 +89,18 @@ fun SetupNavGraph(
                     }
                 },
                 onAddExercise = { 
-                    // Vamos a la librería pero con la intención de seleccionar uno
-                    navController.navigate(Screen.Plans.route) 
+                    navController.navigate("select_exercise") 
                 }
+            )
+        }
+        composable("select_exercise") {
+            val viewModel: ExerciseLibraryViewModel = hiltViewModel()
+            ExerciseLibraryScreen(
+                onExerciseClick = { exerciseId ->
+                    sessionViewModel.addExerciseById(exerciseId)
+                    navController.popBackStack()
+                },
+                viewModel = viewModel
             )
         }
         composable(Screen.Social.route) {
