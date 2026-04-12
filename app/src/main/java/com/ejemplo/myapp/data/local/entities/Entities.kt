@@ -2,13 +2,20 @@ package com.ejemplo.myapp.data.local.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
+import com.ejemplo.myapp.data.local.converters.StringListConverter
 
 @Entity(tableName = "exercises")
+@TypeConverters(StringListConverter::class)
 data class ExerciseEntity(
     @PrimaryKey val id: String,
     val name: String,
-    val level: String,
-    val category: String,
+    val bodyPart: String,
+    val equipment: String,
+    val gifUrl: String,
+    val target: String,
+    val secondaryMuscles: List<String>,
+    val instructions: List<String>,
     val accentColorHex: String
 )
 
@@ -27,7 +34,8 @@ data class SessionExerciseEntity(
     val sessionId: Long,
     val exerciseId: String,
     val exerciseName: String,
-    val accentColorHex: String
+    val accentColorHex: String,
+    val gifUrl: String = ""
 )
 
 @Entity(tableName = "exercise_sets")

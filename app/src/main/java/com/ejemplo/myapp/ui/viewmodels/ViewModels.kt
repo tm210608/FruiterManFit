@@ -16,14 +16,25 @@ class DashboardViewModel @Inject constructor(
     private val repository: FitnessRepository
 ) : ViewModel() {
     val workout: StateFlow<Workout> = MutableStateFlow(repository.getTodaysWorkout())
-    val stats: StateFlow<UserStats> = MutableStateFlow(repository.getUserStats())
+    
+    val stats: StateFlow<UserStats> = repository.getRealUserStats()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = UserStats(1, "Fresh Fruit", 0, "0", 0)
+        )
 }
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val repository: FitnessRepository
 ) : ViewModel() {
-    val stats: StateFlow<UserStats> = MutableStateFlow(repository.getUserStats())
+    val stats: StateFlow<UserStats> = repository.getRealUserStats()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = UserStats(1, "Fresh Fruit", 0, "0", 0)
+        )
 }
 
 @HiltViewModel
@@ -71,15 +82,28 @@ class ExerciseLibraryViewModel @Inject constructor(
 class WorkoutSessionViewModel @Inject constructor(
     private val repository: FitnessRepository
 ) : ViewModel() {
-    private val _activeExercises = MutableStateFlow<List<ActiveExercise>>(
-        listOf(
-            ActiveExercise(
-                "1", "Bench Press", "Chest", BrightBlue,
-                listOf(SessionSet(1, "80", "10", false))
-            )
-        )
-    )
+    private val _activeExercises = MutableStateFlow<List<ActiveExercise>>(emptyList())
     val activeExercises: StateFlow<List<ActiveExercise>> = _activeExercises
+
+    private val _startTime = System.currentTimeMillis()
+
+    fun addExerciseById(exerciseId: String) {
+        viewModelScope.launch {
+            val allExercises = repository.getExercises().first()
+            val exercise = allExercises.find { it.id == exerciseId }
+            
+            exercise?.let {
+                val newActiveExercise = ActiveExercise(
+                    exerciseId = it.id,
+                    name = it.name,
+                    subtitle = it.category,
+                    accentColor = it.accentColor ?: BrightBlue,
+                    sets = listOf(SessionSet(1, "0", "0", false))
+                )
+                _activeExercises.value = _activeExercises.value + newActiveExercise
+            }
+        }
+    }
 
     fun addSet(exerciseId: String) {
         val currentList = _activeExercises.value.toMutableList()
@@ -108,7 +132,20 @@ class WorkoutSessionViewModel @Inject constructor(
         }
     }
 
-    fun finishWorkout() {
-        // Lógica para guardar la sesión usando un UseCase (pendiente crear)
+    fun finishWorkout(onComplete: () -> Unit) {
+        if (_activeExercises.value.isEmpty()) {
+            onComplete()
+            return
+        }
+        viewModelScope.launch {
+            val duration = System.currentTimeMillis() - _startTime
+            repository.saveWorkoutSession(
+                title = "Custom Workout",
+                durationMillis = duration,
+                calories = 250,
+                activeExercises = _activeExercises.value
+            )
+            onComplete()
+        }
     }
 }
