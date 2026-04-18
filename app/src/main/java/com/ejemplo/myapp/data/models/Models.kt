@@ -19,7 +19,10 @@ data class Exercise(
     val target: String,
     val secondaryMuscles: List<String>,
     val instructions: List<String>,
-    val accentColor: Color? = null
+    val accentColor: Color? = null,
+    val description: String = "",
+    val difficulty: String = "",
+    val category: String = ""
 )
 
 data class UserStats(
@@ -27,7 +30,11 @@ data class UserStats(
     val rank: String,
     val streak: Int,
     val calories: String,
-    val goalReached: Int
+    val goalReached: Int,
+    val totalVolume: Double = 0.0,
+    val weeklyVolume: List<Double> = emptyList(),
+    val weeklySessionsCount: Int = 0,
+    val weeklyGoal: Int = 5
 )
 
 data class SessionSet(

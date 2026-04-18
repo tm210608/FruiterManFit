@@ -45,7 +45,7 @@ class ExerciseLibraryViewModel @Inject constructor(
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery
 
-    private val _selectedFilter = MutableStateFlow("All")
+    private val _selectedFilter = MutableStateFlow("Todo")
     val selectedFilter: StateFlow<String> = _selectedFilter
 
     private val _isLoading = MutableStateFlow(false)
@@ -57,7 +57,7 @@ class ExerciseLibraryViewModel @Inject constructor(
         _selectedFilter
     ) { list, query, filter ->
         list.filter { exercise ->
-            val matchesFilter = if (filter == "All") {
+            val matchesFilter = if (filter == "Todo" || filter == "All") {
                 true
             } else {
                 // Comparamos ignorando mayúsculas/minúsculas y espacios
@@ -151,20 +151,51 @@ class WorkoutSessionViewModel @Inject constructor(
         }
     }
 
-    fun finishWorkout(onComplete: () -> Unit) {
+    fun removeExercise(exerciseId: String) {
+        _activeExercises.value = _activeExercises.value.filterNot { it.exerciseId == exerciseId }
+    }
+
+    fun removeSet(exerciseId: String, setNumber: Int) {
+        val currentList = _activeExercises.value.toMutableList()
+        val index = currentList.indexOfFirst { it.exerciseId == exerciseId }
+        if (index != -1) {
+            val exercise = currentList[index]
+            val newSets = exercise.sets.filterNot { it.number == setNumber }
+                .mapIndexed { i, set -> set.copy(number = i + 1) } // Renumber sets
+            currentList[index] = exercise.copy(sets = newSets)
+            _activeExercises.value = currentList
+        }
+    }
+
+    fun finishWorkout(onComplete: (Long, Int, Double) -> Unit) {
         if (_activeExercises.value.isEmpty()) {
-            onComplete()
+            onComplete(0L, 0, 0.0)
             return
         }
         viewModelScope.launch {
             val duration = System.currentTimeMillis() - _startTime
+            
+            // Cálculo dinámico de volumen y calorías
+            var totalVolume = 0.0
+            _activeExercises.value.forEach { ex ->
+                totalVolume += ex.sets.filter { it.isDone }.sumOf { 
+                    (it.weight.toDoubleOrNull() ?: 0.0) * (it.reps.toIntOrNull() ?: 0) 
+                }
+            }
+            
+            val calories = (totalVolume * 0.05).toInt().coerceAtLeast(50)
+
             repository.saveWorkoutSession(
                 title = "Custom Workout",
                 durationMillis = duration,
-                calories = 250,
+                calories = calories,
                 activeExercises = _activeExercises.value
             )
-            onComplete()
+            onComplete(duration, calories, totalVolume)
         }
+    }
+
+    fun resetSession() {
+        _activeExercises.value = emptyList()
     }
 }

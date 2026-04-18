@@ -32,6 +32,49 @@ fun WorkoutLogScreen(
     onAddExercise: () -> Unit
 ) {
     val activeExercises by viewModel.activeExercises.collectAsState()
+    var restTimeLeft by remember { mutableLongStateOf(0L) }
+    var isTimerActive by remember { mutableStateOf(false) }
+    
+    var showSummary by remember { mutableStateOf(false) }
+    var summaryData by remember { mutableStateOf<Triple<Long, Int, Double>?>(null) }
+
+    LaunchedEffect(isTimerActive) {
+        if (isTimerActive) {
+            while (restTimeLeft > 0) {
+                kotlinx.coroutines.delay(1000)
+                restTimeLeft -= 1000
+            }
+            isTimerActive = false
+        }
+    }
+
+    if (showSummary && summaryData != null) {
+        WorkoutSummaryDialog(
+            durationMillis = summaryData!!.first,
+            calories = summaryData!!.second,
+            totalVolume = summaryData!!.third,
+            onDismiss = {
+                showSummary = false
+                viewModel.resetSession() // Limpiar ejercicios activos
+                onFinish() // Volver a Home
+            }
+        )
+    }
+
+    // Timer logic for Duration display
+    var elapsedTime by remember { mutableLongStateOf(0L) }
+    LaunchedEffect(Unit) {
+        val startTime = System.currentTimeMillis()
+        while (true) {
+            elapsedTime = System.currentTimeMillis() - startTime
+            kotlinx.coroutines.delay(1000)
+        }
+    }
+
+    val seconds = (elapsedTime / 1000) % 60
+    val minutes = (elapsedTime / (1000 * 60)) % 60
+    val hours = (elapsedTime / (1000 * 60 * 60))
+    val timeString = if (hours > 0) String.format("%d:%02d:%02d", hours, minutes, seconds) else String.format("%02d:%02d", minutes, seconds)
 
     Column(
         modifier = Modifier
@@ -40,7 +83,7 @@ fun WorkoutLogScreen(
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 24.dp)
     ) {
-        // Session Header
+        // ... (Header stays the same)
         Row(
             modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -56,13 +99,24 @@ fun WorkoutLogScreen(
             }
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text("Active Session", fontWeight = FontWeight.Black, fontSize = 20.sp)
-                Text("Morning Muscle Burn 🔥", color = BrightBlue, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                Text("Sesión Activa", fontWeight = FontWeight.Black, fontSize = 20.sp)
+                Text("Quema de Músculo Mañanera 🔥", color = BrightBlue, fontSize = 13.sp, fontWeight = FontWeight.Bold)
             }
             Column(horizontalAlignment = Alignment.End) {
-                Text("00:42:15", fontWeight = FontWeight.Black, fontSize = 24.sp, color = OnSurface)
-                Text("DURATION", fontSize = 9.sp, fontWeight = FontWeight.Black, color = OnSurfaceVariant)
+                Text(timeString, fontWeight = FontWeight.Black, fontSize = 24.sp, color = OnSurface)
+                Text("DURACIÓN", fontSize = 9.sp, fontWeight = FontWeight.Black, color = OnSurfaceVariant)
             }
+        }
+
+        if (restTimeLeft > 0) {
+            RestTimerComponent(
+                timeLeftMillis = restTimeLeft,
+                onCancel = { 
+                    restTimeLeft = 0
+                    isTimerActive = false
+                }
+            )
+            Spacer(modifier = Modifier.height(20.dp))
         }
         
         activeExercises.forEach { activeExercise ->
@@ -72,32 +126,152 @@ fun WorkoutLogScreen(
                 accentColor = activeExercise.accentColor,
                 sets = activeExercise.sets,
                 onAddSet = { viewModel.addSet(activeExercise.exerciseId) },
+                onRemoveSet = { setNumber -> viewModel.removeSet(activeExercise.exerciseId, setNumber) },
                 onUpdateSet = { setNumber, weight, reps, isDone ->
                     viewModel.updateSet(activeExercise.exerciseId, setNumber, weight, reps, isDone)
-                }
+                    if (isDone) {
+                        restTimeLeft = 60000L // 60 seconds rest
+                        isTimerActive = true
+                    }
+                },
+                onRemoveExercise = { viewModel.removeExercise(activeExercise.exerciseId) }
             )
             Spacer(modifier = Modifier.height(20.dp))
         }
         
         if (activeExercises.isEmpty()) {
             Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
-                Text(text = "No exercises yet!", color = OnSurfaceVariant)
+                Text(text = "¡Aún no hay ejercicios!", color = OnSurfaceVariant)
             }
         }
 
         Spacer(modifier = Modifier.height(32.dp))
         
-        AppButton(text = "+ ADD EXERCISE", onClick = onAddExercise, containerColor = Surface)
+        AppButton(text = "+ AÑADIR EJERCICIO", onClick = onAddExercise, containerColor = Surface)
         Spacer(modifier = Modifier.height(16.dp))
         AppButton(
-            text = "FINISH WORKOUT", 
+            text = "FINALIZAR ENTRENO", 
             onClick = {
-                viewModel.finishWorkout(onComplete = onFinish)
+                viewModel.finishWorkout(onComplete = { duration, calories, volume ->
+                    summaryData = Triple(duration, calories, volume)
+                    showSummary = true
+                })
             }, 
             containerColor = BrightLime
         )
 
         Spacer(modifier = Modifier.height(120.dp))
+    }
+}
+
+@Composable
+fun WorkoutSummaryDialog(
+    durationMillis: Long,
+    calories: Int,
+    totalVolume: Double,
+    onDismiss: () -> Unit
+) {
+    val seconds = (durationMillis / 1000) % 60
+    val minutes = (durationMillis / (1000 * 60)) % 60
+    val hours = (durationMillis / (1000 * 60 * 60))
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = Surface,
+        shape = RoundedCornerShape(32.dp),
+        modifier = Modifier.padding(16.dp),
+        title = {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                Text("¡Buen Trabajo!", fontSize = 24.sp, fontWeight = FontWeight.Black, color = BrightLime)
+                Text("Entrenamiento Completado 🍏", fontSize = 14.sp, color = OnSurfaceVariant)
+                Spacer(modifier = Modifier.height(8.dp))
+                if (totalVolume > 0) {
+                    Text(
+                        "Has movido un total de ${totalVolume.toInt()} kg",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = BrightBlue,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+        },
+        text = {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                SummaryStat(
+                    value = if (hours > 0) String.format("%d:%02d:%02d", hours, minutes, seconds) else String.format("%02d:%02d", minutes, seconds),
+                    label = "TIEMPO",
+                    icon = Icons.Default.Timer
+                )
+                SummaryStat(
+                    value = String.format("%.0f", totalVolume),
+                    label = "VOLUMEN (KG)",
+                    icon = Icons.Default.FitnessCenter
+                )
+                SummaryStat(
+                    value = calories.toString(),
+                    label = "CALORÍAS",
+                    icon = Icons.Default.LocalFireDepartment
+                )
+            }
+        },
+        confirmButton = {
+            AppButton(
+                text = "CONTINUAR",
+                onClick = onDismiss,
+                containerColor = BrightLime,
+                modifier = Modifier.padding(bottom = 16.dp, start = 16.dp, end = 16.dp)
+            )
+        }
+    )
+}
+
+@Composable
+fun SummaryStat(value: String, label: String, icon: androidx.compose.ui.graphics.vector.ImageVector) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Icon(icon, contentDescription = null, tint = OnSurfaceVariant, modifier = Modifier.size(24.dp))
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(value, fontSize = 20.sp, fontWeight = FontWeight.Black, color = OnSurface)
+        Text(label, fontSize = 9.sp, fontWeight = FontWeight.Bold, color = OnSurfaceVariant, letterSpacing = 1.sp)
+    }
+}
+
+@Composable
+fun RestTimerComponent(timeLeftMillis: Long, onCancel: () -> Unit) {
+    val seconds = (timeLeftMillis / 1000) % 60
+    val minutes = (timeLeftMillis / (1000 * 60)) % 60
+    
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = BrightBlue.copy(alpha = 0.1f)),
+        shape = RoundedCornerShape(24.dp),
+        border = BorderStroke(1.dp, BrightBlue.copy(alpha = 0.3f))
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.Refresh, contentDescription = null, tint = BrightBlue)
+                Spacer(modifier = Modifier.width(12.dp))
+                Column {
+                    Text("TIEMPO DE DESCANSO", fontSize = 10.sp, fontWeight = FontWeight.Black, color = BrightBlue)
+                    Text(
+                        text = String.format("%02d:%02d", minutes, seconds),
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Black,
+                        color = OnSurface
+                    )
+                }
+            }
+            IconButton(onClick = onCancel) {
+                Icon(Icons.Default.Close, contentDescription = "Cancel", tint = OnSurfaceVariant)
+            }
+        }
     }
 }
 
@@ -108,7 +282,9 @@ fun ExerciseSessionCard(
     accentColor: Color, 
     sets: List<com.ejemplo.myapp.data.models.SessionSet>,
     onAddSet: () -> Unit,
-    onUpdateSet: (Int, String, String, Boolean) -> Unit
+    onRemoveSet: (Int) -> Unit,
+    onUpdateSet: (Int, String, String, Boolean) -> Unit,
+    onRemoveExercise: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -123,12 +299,29 @@ fun ExerciseSessionCard(
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Column {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(text = title, fontSize = 20.sp, fontWeight = FontWeight.Black, color = accentColor)
                     Text(text = subtitle, fontSize = 12.sp, color = OnSurfaceVariant)
                 }
-                IconButton(onClick = {}) {
-                    Icon(Icons.Default.MoreVert, contentDescription = null, tint = OnSurfaceVariant)
+                var showMenu by remember { mutableStateOf(false) }
+                Box {
+                    IconButton(onClick = { showMenu = true }) {
+                        Icon(Icons.Default.MoreVert, contentDescription = null, tint = OnSurfaceVariant)
+                    }
+                    DropdownMenu(
+                        expanded = showMenu,
+                        onDismissRequest = { showMenu = false },
+                        modifier = Modifier.background(Surface)
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Quitar Ejercicio", color = Color.Red) },
+                            onClick = {
+                                showMenu = false
+                                onRemoveExercise()
+                            },
+                            leadingIcon = { Icon(Icons.Default.Delete, contentDescription = null, tint = Color.Red) }
+                        )
+                    }
                 }
             }
             
@@ -139,14 +332,24 @@ fun ExerciseSessionCard(
                 HeaderText("SET", Modifier.width(40.dp))
                 HeaderText("KG", Modifier.weight(1f))
                 HeaderText("REPS", Modifier.weight(1f))
-                HeaderText("DONE", Modifier.width(60.dp))
+                HeaderText("HECHO", Modifier.width(60.dp))
             }
             
             Spacer(modifier = Modifier.height(12.dp))
             
             sets.forEach { set ->
-                EditableSetRow(set, accentColor) { weight, reps, isDone ->
-                    onUpdateSet(set.number, weight, reps, isDone)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(modifier = Modifier.weight(1f)) {
+                        EditableSetRow(set, accentColor) { weight, reps, isDone ->
+                            onUpdateSet(set.number, weight, reps, isDone)
+                        }
+                    }
+                    IconButton(
+                        onClick = { onRemoveSet(set.number) },
+                        modifier = Modifier.size(32.dp).padding(start = 4.dp)
+                    ) {
+                        Icon(Icons.Default.Close, contentDescription = "Remove Set", tint = OnSurfaceVariant.copy(alpha = 0.5f), modifier = Modifier.size(16.dp))
+                    }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
             }
@@ -159,7 +362,7 @@ fun ExerciseSessionCard(
                 border = BorderStroke(1.dp, Color.White.copy(alpha = 0.1f)),
                 shape = RoundedCornerShape(16.dp)
             ) {
-                Text("+ ADD SET", fontWeight = FontWeight.Black, color = OnSurface.copy(alpha = 0.6f), fontSize = 12.sp)
+                Text("+ AÑADIR SET", fontWeight = FontWeight.Black, color = OnSurface.copy(alpha = 0.6f), fontSize = 12.sp)
             }
         }
     }

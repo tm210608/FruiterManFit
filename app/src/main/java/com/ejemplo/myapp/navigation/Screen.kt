@@ -14,6 +14,7 @@ sealed class Screen(val route: String, val icon: ImageVector? = null, val label:
     object Social : Screen("social", Icons.Default.Groups, "SOCIAL")
     object Profile : Screen("profile", Icons.Default.Person, "PROFILE")
     object Settings : Screen("settings", Icons.Default.Settings, "SETTINGS")
+    object History : Screen("history")
     object ExerciseDetail : Screen("exercise_detail/{exerciseId}") {
         fun createRoute(exerciseId: String) = "exercise_detail/$exerciseId"
     }

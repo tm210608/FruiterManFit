@@ -1,39 +1,28 @@
 package com.ejemplo.myapp.data.remote
 
+import com.google.gson.annotations.SerializedName
 import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.Path
-import retrofit2.http.Query
 
 interface ExerciseApiService {
-    @GET("exercises")
-    suspend fun getAllExercises(
-        @Header("X-RapidAPI-Key") apiKey: String,
-        @Header("X-RapidAPI-Host") host: String = "exercisedb.p.rapidapi.com",
-        @Query("limit") limit: Int = 500
-    ): List<ExerciseDto>
+    // Apuntamos al archivo JSON que contiene los 1327 ejercicios con el esquema original de ExerciseDB
+    @GET("exercises.json")
+    suspend fun getFullDataset(): List<ExerciseDto>
 
-    @GET("exercises/bodyPartList")
-    suspend fun getBodyPartList(
-        @Header("X-RapidAPI-Key") apiKey: String,
-        @Header("X-RapidAPI-Host") host: String = "exercisedb.p.rapidapi.com"
-    ): List<String>
-
-    @GET("exercises/bodyPart/{bodyPart}")
-    suspend fun getExercisesByBodyPart(
-        @Header("X-RapidAPI-Key") apiKey: String,
-        @Path("bodyPart") bodyPart: String,
-        @Header("X-RapidAPI-Host") host: String = "exercisedb.p.rapidapi.com"
-    ): List<ExerciseDto>
+    // Funciones legacy
+    suspend fun getAllExercises(): List<ExerciseDto> = getFullDataset()
 }
 
 data class ExerciseDto(
-    val id: String?,
-    val name: String?,
-    val bodyPart: String?,
-    val equipment: String?,
-    val gifUrl: String?,
-    val target: String?,
-    val secondaryMuscles: List<String>?,
-    val instructions: List<String>?
+    @SerializedName("id") val id: String?,
+    @SerializedName("name") val name: String?,
+    @SerializedName("bodyPart") val bodyPart: String?,
+    @SerializedName("equipment") val equipment: String?,
+    @SerializedName("gifUrl") val gifUrl: String?,
+    @SerializedName("target") val target: String?,
+    @SerializedName("secondaryMuscles") val secondaryMuscles: List<String>?,
+    @SerializedName("instructions") val instructions: Any?,
+    @SerializedName("images") val images: List<String>?,
+    @SerializedName("description") val description: String?,
+    @SerializedName("difficulty") val difficulty: String?,
+    @SerializedName("category") val category: String?
 )

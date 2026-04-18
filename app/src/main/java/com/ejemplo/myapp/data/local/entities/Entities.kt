@@ -16,7 +16,10 @@ data class ExerciseEntity(
     val target: String,
     val secondaryMuscles: List<String>,
     val instructions: List<String>,
-    val accentColorHex: String
+    val accentColorHex: String,
+    val description: String = "",
+    val difficulty: String = "",
+    val category: String = ""
 )
 
 @Entity(tableName = "workout_sessions")

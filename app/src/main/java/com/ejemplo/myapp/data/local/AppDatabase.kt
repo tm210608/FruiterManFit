@@ -16,7 +16,7 @@ import com.ejemplo.myapp.data.local.entities.*
         SessionExerciseEntity::class,
         ExerciseSetEntity::class
     ],
-    version = 2, // Subimos a la versión 2
+    version = 3, // Incrementamos a 3 para forzar la recreación tras los cambios de esquema
     exportSchema = false
 )
 @TypeConverters(StringListConverter::class)

@@ -28,14 +28,24 @@ object NetworkModule {
     fun provideOkHttpClient(loggingInterceptor: HttpLoggingInterceptor): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
+            .addInterceptor { chain ->
+                val request = chain.request().newBuilder()
+                    .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36")
+                    .build()
+                chain.proceed(request)
+            }
+            .connectTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+            .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
             .build()
     }
 
     @Provides
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        val baseUrl = "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/dist/"
+        android.util.Log.d("FruiterMan", "Configurando Retrofit con baseUrl: $baseUrl")
         return Retrofit.Builder()
-            .baseUrl("https://exercisedb.p.rapidapi.com/")
+            .baseUrl(baseUrl)
             .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient)
             .build()

@@ -110,10 +110,15 @@ fun Tag(text: String, containerColor: Color = Color.White.copy(alpha = 0.1f), co
 }
 
 @Composable
-fun AppButton(text: String, onClick: () -> Unit, containerColor: Color = BrightBlue) {
+fun AppButton(
+    text: String, 
+    onClick: () -> Unit, 
+    modifier: Modifier = Modifier,
+    containerColor: Color = BrightBlue
+) {
     Button(
         onClick = onClick,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(56.dp),
         colors = ButtonDefaults.buttonColors(containerColor = containerColor),

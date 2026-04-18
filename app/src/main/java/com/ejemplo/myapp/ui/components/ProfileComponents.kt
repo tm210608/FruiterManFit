@@ -36,15 +36,50 @@ fun RecapDivider() {
 }
 
 @Composable
-fun ProgressChart(modifier: Modifier = Modifier) {
+fun ProgressChart(
+    modifier: Modifier = Modifier,
+    data: List<Double> = emptyList()
+) {
     Canvas(modifier = modifier) {
         val width = size.width
         val height = size.height
-        val path = Path().apply {
-            moveTo(0f, height * 0.8f)
-            cubicTo(width * 0.2f, height * 0.8f, width * 0.4f, height * 0.2f, width * 0.6f, height * 0.4f)
-            cubicTo(width * 0.8f, height * 0.6f, width * 0.9f, 0f, width, height * 0.2f)
+        
+        if (data.size < 2) {
+            // Draw placeholder or empty state
+            val path = Path().apply {
+                moveTo(0f, height * 0.8f)
+                cubicTo(width * 0.2f, height * 0.8f, width * 0.4f, height * 0.2f, width * 0.6f, height * 0.4f)
+                cubicTo(width * 0.8f, height * 0.6f, width * 0.9f, 0f, width, height * 0.2f)
+            }
+            drawPath(
+                path = path,
+                color = BrightLime.copy(alpha = 0.3f),
+                style = Stroke(width = 4.dp.toPx())
+            )
+            return@Canvas
         }
+
+        val maxVal = (data.maxOrNull() ?: 1.0).coerceAtLeast(1.0)
+        val path = Path()
+        
+        data.forEachIndexed { index, value ->
+            val x = index * (width / (data.size - 1))
+            val y = height - (value.toFloat() / maxVal.toFloat() * height * 0.8f) - (height * 0.1f)
+            
+            if (index == 0) {
+                path.moveTo(x, y)
+            } else {
+                val prevX = (index - 1) * (width / (data.size - 1))
+                val prevY = height - (data[index - 1].toFloat() / maxVal.toFloat() * height * 0.8f) - (height * 0.1f)
+                
+                path.cubicTo(
+                    prevX + (x - prevX) / 2, prevY,
+                    prevX + (x - prevX) / 2, y,
+                    x, y
+                )
+            }
+        }
+
         drawPath(
             path = path,
             color = BrightLime,

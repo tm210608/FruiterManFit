@@ -8,6 +8,8 @@ import com.ejemplo.myapp.data.remote.ExerciseApiService
 import com.ejemplo.myapp.data.remote.ExerciseDto
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -28,37 +30,34 @@ class FitnessRepository @Inject constructor(
         return fitnessDao.getExerciseById(id)?.toDomain()
     }
 
-    // Fetch from ExerciseDB API and Save to Local DB
+    // CARGA DESDE EXERCISEDB (1300+ EJERCICIOS CON GIFS)
     suspend fun refreshExercises(apiKey: String) = withContext(Dispatchers.IO) {
-        Log.d("FruiterMan", "Iniciando descarga incremental por categorías...")
+        Log.d("FruiterMan", "Iniciando descarga desde ExerciseDB...")
         try {
-            // 1. Obtener lista de partes del cuerpo
-            val bodyParts = exerciseApiService.getBodyPartList(apiKey = apiKey)
-            Log.d("FruiterMan", "Categorías encontradas: ${bodyParts.size}")
-
-            val allExercises = mutableListOf<ExerciseDto>()
+            val allExercises = exerciseApiService.getFullDataset()
             
-            // 2. Descargar ejercicios por categoría
-            bodyParts.forEach { bodyPart ->
-                Log.d("FruiterMan", "Descargando ejercicios para: $bodyPart")
-                try {
-                    val exercises = exerciseApiService.getExercisesByBodyPart(apiKey = apiKey, bodyPart = bodyPart)
-                    allExercises.addAll(exercises)
-                } catch (e: Exception) {
-                    Log.e("FruiterMan", "Error descargando $bodyPart: ${e.message}")
-                }
+            if (allExercises.isEmpty()) {
+                Log.e("FruiterMan", "Error: El dataset vino vacío.")
+                return@withContext
             }
-
-            Log.d("FruiterMan", "Total descargados: ${allExercises.size}")
             
-            val entities = allExercises.map { it.toEntity() }
+            Log.d("FruiterMan", "Descargados ${allExercises.size} ejercicios con éxito.")
+
+            val entities = allExercises
+                .filter { it.id != null }
+                .distinctBy { it.id }
+                .map { it.toEntity() }
+            
+            fitnessDao.clearExercises() // Limpiamos para asegurar que las nuevas URLs de imagen se guarden
             fitnessDao.insertExercises(entities)
-            Log.d("FruiterMan", "¡Sincronización con ExerciseDB completada!")
+            val finalCount = fitnessDao.getExerciseCount()
+            Log.d("FruiterMan", "Sincronización finalizada. Total real en BD: $finalCount")
         } catch (e: Exception) {
-            Log.e("FruiterMan", "Error crítico en refreshExercises: ${e.message}")
+            Log.e("FruiterMan", "Error crítico en sincronización: ${e.message}")
             e.printStackTrace()
         }
     }
+
 
     // Sessions
     suspend fun saveWorkoutSession(title: String, durationMillis: Long, calories: Int, activeExercises: List<ActiveExercise>) {
@@ -96,14 +95,44 @@ class FitnessRepository @Inject constructor(
         }
     }
 
-    fun getAllSessions(): Flow<List<WorkoutSessionEntity>> = fitnessDao.getAllSessions()
+    fun getAllSessions(): Flow<List<WorkoutSessionEntity>> {
+        return fitnessDao.getFullSessions().map { fullSessions ->
+            fullSessions.map { it.session }
+        }
+    }
 
     // Dashboard Data - Calculated from Room
     fun getRealUserStats(): Flow<UserStats> {
-        return fitnessDao.getAllSessions().map { sessions ->
-            val totalCalories = sessions.sumOf { it.totalCalories }
-            val sessionCount = sessions.size
+        return fitnessDao.getFullSessions().map { fullSessions ->
+            val totalCalories = fullSessions.sumOf { it.session.totalCalories }
+            val sessionCount = fullSessions.size
             
+            // Calculate total volume from all done sets in all sessions
+            val allSets = fullSessions.flatMap { session -> 
+                session.exercises.flatMap { it.sets }
+            }
+            val totalVolume = allSets.filter { it.isDone }.sumOf { it.weight * it.reps }
+            
+            // Calculate Weekly Volume and Session Count (last 7 days)
+            val now = System.currentTimeMillis()
+            val dayMillis = 24 * 60 * 60 * 1000L
+            val weekStart = now - (7 * dayMillis)
+            
+            val sessionsThisWeek = fullSessions.filter { it.session.startTime >= weekStart }
+            val weeklySessionsCount = sessionsThisWeek.size
+
+            val weeklyVolume = (0..6).map { dayOffset ->
+                val dayStart = now - (6 - dayOffset + 1) * dayMillis
+                val dayEnd = now - (6 - dayOffset) * dayMillis
+                
+                fullSessions
+                    .filter { it.session.startTime in dayStart..dayEnd }
+                    .flatMap { it.exercises }
+                    .flatMap { it.sets }
+                    .filter { it.isDone }
+                    .sumOf { it.weight * it.reps }
+            }
+
             UserStats(
                 level = (sessionCount / 5) + 1,
                 rank = when {
@@ -111,16 +140,47 @@ class FitnessRepository @Inject constructor(
                     sessionCount > 20 -> "Fruit Ninja"
                     else -> "Fresh Fruit"
                 },
-                streak = calculateStreak(sessions),
+                streak = calculateStreak(fullSessions.map { it.session }),
                 calories = if (totalCalories >= 1000) "${String.format("%.1f", totalCalories / 1000.0)}k" else totalCalories.toString(),
-                goalReached = (sessionCount % 10) * 10
+                goalReached = (sessionCount % 10) * 10,
+                totalVolume = totalVolume,
+                weeklyVolume = weeklyVolume,
+                weeklySessionsCount = weeklySessionsCount,
+                weeklyGoal = 5 // Meta por defecto
             )
         }
     }
 
     private fun calculateStreak(sessions: List<WorkoutSessionEntity>): Int {
         if (sessions.isEmpty()) return 0
-        return sessions.size 
+        
+        val dates = sessions.map { 
+            java.util.Calendar.getInstance().apply { 
+                timeInMillis = it.startTime 
+                set(java.util.Calendar.HOUR_OF_DAY, 0)
+                set(java.util.Calendar.MINUTE, 0)
+                set(java.util.Calendar.SECOND, 0)
+                set(java.util.Calendar.MILLISECOND, 0)
+            }.timeInMillis 
+        }.distinct().sortedDescending()
+
+        var streak = 0
+        var currentDay = java.util.Calendar.getInstance().apply {
+            set(java.util.Calendar.HOUR_OF_DAY, 0)
+            set(java.util.Calendar.MINUTE, 0)
+            set(java.util.Calendar.SECOND, 0)
+            set(java.util.Calendar.MILLISECOND, 0)
+        }.timeInMillis
+
+        for (date in dates) {
+            if (date == currentDay || date == currentDay - 86400000L) {
+                streak++
+                currentDay = date
+            } else {
+                break
+            }
+        }
+        return streak
     }
 
     fun getTodaysWorkout() = Workout(
@@ -140,18 +200,37 @@ class FitnessRepository @Inject constructor(
         target = target,
         secondaryMuscles = secondaryMuscles,
         instructions = instructions,
-        accentColor = androidx.compose.ui.graphics.Color(android.graphics.Color.parseColor(accentColorHex))
+        accentColor = androidx.compose.ui.graphics.Color(android.graphics.Color.parseColor(accentColorHex)),
+        description = description,
+        difficulty = difficulty,
+        category = category
     )
 
     private fun ExerciseDto.toEntity() = ExerciseEntity(
         id = id ?: "",
         name = name ?: "Unknown",
         bodyPart = bodyPart ?: "Various",
-        equipment = equipment ?: "No equipment",
-        gifUrl = gifUrl ?: "",
+        equipment = (equipment ?: "body weight").lowercase(),
+        gifUrl = if (!images.isNullOrEmpty()) {
+            val imagePath = images[0]
+            // El README indica: https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/
+            // El JSON ya trae "Ab_Roller/0.jpg", así que solo concatenamos el base URL correcto.
+            val url = "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/$imagePath"
+            android.util.Log.d("FruiterMan", "Mapeando imagen: $imagePath -> $url")
+            url
+        } else {
+            gifUrl?.replace("http://", "https://") ?: ""
+        },
         target = target ?: "General",
         secondaryMuscles = secondaryMuscles ?: emptyList(),
-        instructions = instructions ?: emptyList(),
+        instructions = when (instructions) {
+            is List<*> -> instructions.map { it.toString() }
+            is String -> instructions.split(". ").filter { it.isNotBlank() }
+            else -> emptyList()
+        },
+        description = description ?: "",
+        difficulty = difficulty ?: "",
+        category = category ?: "",
         accentColorHex = when(bodyPart?.lowercase()) {
             "chest" -> "#FF4B4B"
             "back" -> "#4B7BFF"
@@ -159,6 +238,7 @@ class FitnessRepository @Inject constructor(
             "upper arms", "lower arms" -> "#BC4BFF"
             "upper legs", "lower legs" -> "#4BFF81"
             "waist" -> "#FF4BEB"
+            "cardio" -> "#FF4B4B"
             else -> "#00D4FF"
         }
     )

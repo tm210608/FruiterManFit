@@ -78,6 +78,84 @@ fun StatCard(
 }
 
 @Composable
+fun VolumeChart(
+    weeklyVolume: List<Double>,
+    modifier: Modifier = Modifier
+) {
+    val maxVolume = weeklyVolume.maxOrNull()?.coerceAtLeast(1.0) ?: 1.0
+    val days = listOf("L", "M", "X", "J", "V", "S", "D")
+
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(200.dp),
+        shape = RoundedCornerShape(32.dp),
+        colors = CardDefaults.cardColors(containerColor = Surface)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(20.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    "VOLUMEN SEMANAL",
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Black,
+                    color = OnSurfaceVariant,
+                    letterSpacing = 1.sp
+                )
+                Text(
+                    "${weeklyVolume.sum().toInt()} KG",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Black,
+                    color = BrightLime
+                )
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                weeklyVolume.forEachIndexed { index, volume ->
+                    val barHeight = (volume / maxVolume * 80).dp.coerceAtLeast(4.dp)
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Bottom
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .width(12.dp)
+                                .height(barHeight)
+                                .clip(RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp))
+                                .background(
+                                    if (index == weeklyVolume.size - 1) BrightLime else BrightBlue.copy(alpha = 0.6f)
+                                )
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = days[index],
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = OnSurfaceVariant
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun FeaturedWorkoutCard(
     title: String,
     duration: String,

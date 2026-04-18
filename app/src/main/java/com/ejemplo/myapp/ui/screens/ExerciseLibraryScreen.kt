@@ -1,6 +1,5 @@
 package com.ejemplo.myapp.ui.screens
 
-import android.os.Build.VERSION.SDK_INT
 import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -20,10 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.ImageLoader
 import coil.compose.SubcomposeAsyncImage
-import coil.decode.GifDecoder
-import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
 import com.ejemplo.myapp.ui.theme.*
 import com.ejemplo.myapp.ui.viewmodels.ExerciseLibraryViewModel
@@ -32,6 +28,7 @@ import com.ejemplo.myapp.ui.viewmodels.ExerciseLibraryViewModel
 @Composable
 fun ExerciseLibraryScreen(
     onExerciseClick: (String) -> Unit = {},
+    onAddExercise: (String) -> Unit = {},
     viewModel: ExerciseLibraryViewModel
 ) {
     val exercises by viewModel.exercises.collectAsState()
@@ -39,21 +36,101 @@ fun ExerciseLibraryScreen(
     val selectedFilter by viewModel.selectedFilter.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
-    val myApiKey = "e039faa7c4msh8c3b03cd185d65dp10ef44jsnc97b003b7753"
+    var selectedExercise by remember { mutableStateOf<com.ejemplo.myapp.data.models.Exercise?>(null) }
+    val sheetState = rememberModalBottomSheetState()
+    var showSheet by remember { mutableStateOf(false) }
 
-    // IMPORTANTE: Optimizamos el cargador de GIFs para que no se recree
+    val myApiKey = "e039faa7c4msh8c3b03cd185d65dp10ef44jsnc97b003b7753"
+    
+    // USAR EL ImageLoader GLOBAL que soporta GIFs
     val context = LocalContext.current
-    val imageLoader = remember {
-        ImageLoader.Builder(context)
-            .components {
-                if (SDK_INT >= 28) {
-                    add(ImageDecoderDecoder.Factory())
-                } else {
-                    add(GifDecoder.Factory())
+    val imageLoader = (context.applicationContext as? coil.ImageLoaderFactory)?.newImageLoader() 
+        ?: coil.ImageLoader.Builder(context).build()
+
+    if (showSheet && selectedExercise != null) {
+        ModalBottomSheet(
+            onDismissRequest = { showSheet = false },
+            sheetState = sheetState,
+            containerColor = Surface,
+            dragHandle = { BottomSheetDefaults.DragHandle(color = OnSurfaceVariant.copy(alpha = 0.4f)) }
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 48.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Card(
+                    modifier = Modifier.size(200.dp),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White)
+                ) {
+                    if (selectedExercise!!.gifUrl.isNotEmpty()) {
+                        SubcomposeAsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(selectedExercise!!.gifUrl.replace("http://", "https://"))
+                                .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36")
+                                .crossfade(true)
+                                .build(),
+                            imageLoader = imageLoader,
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Fit,
+                            loading = {
+                                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                    CircularProgressIndicator(color = selectedExercise!!.accentColor ?: BrightLime)
+                                }
+                            },
+                            error = {
+                                Log.e("FruiterMan", "Error cargando GIF: ${selectedExercise!!.gifUrl}")
+                                ExercisePlaceholder(selectedExercise!!.bodyPart, selectedExercise!!.equipment, selectedExercise!!.accentColor ?: BrightBlue)
+                            }
+                        )
+                    } else {
+                        ExercisePlaceholder(selectedExercise!!.bodyPart, selectedExercise!!.equipment, selectedExercise!!.accentColor ?: BrightBlue)
+                    }
+                }
+// ... resto del ModalBottomSheet
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(selectedExercise!!.name.uppercase(), fontWeight = FontWeight.Black, fontSize = 20.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                Text(selectedExercise!!.bodyPart.uppercase(), color = BrightLime, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                
+                Spacer(modifier = Modifier.height(32.dp))
+                
+                Button(
+                    onClick = {
+                        showSheet = false
+                        onExerciseClick(selectedExercise!!.id)
+                    },
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Surface),
+                    border = BorderStroke(1.dp, Color.White.copy(alpha = 0.1f)),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Icon(Icons.Default.Info, contentDescription = null, tint = BrightBlue)
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text("VER INSTRUCCIONES", color = OnSurface, fontWeight = FontWeight.Bold)
+                }
+                
+                Spacer(modifier = Modifier.height(12.dp))
+                
+                Button(
+                    onClick = {
+                        showSheet = false
+                        onAddExercise(selectedExercise!!.id)
+                    },
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = BrightLime),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = null, tint = Background)
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text("AÑADIR AL ENTRENAMIENTO", color = Background, fontWeight = FontWeight.Black)
                 }
             }
-            .crossfade(true)
-            .build()
+        }
     }
 
     Column(
@@ -71,14 +148,13 @@ fun ExerciseLibraryScreen(
         ) {
             Column {
                 Text(
-                    text = "EXPLORE\nLIBRARY",
+                    text = "EXPLORA LA\nBIBLIOTECA",
                     fontSize = 36.sp,
                     fontWeight = FontWeight.Black,
                     lineHeight = 34.sp
                 )
-                // Contador para saber si hay datos en la DB
                 Text(
-                    text = "${exercises.size} Exercises Loaded",
+                    text = "${exercises.size} Ejercicios Cargados",
                     color = BrightLime,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold
@@ -119,7 +195,7 @@ fun ExerciseLibraryScreen(
             TextField(
                 value = searchQuery,
                 onValueChange = { viewModel.onSearchQueryChanged(it) },
-                placeholder = { Text("Search exercises...", color = OnSurfaceVariant, fontSize = 14.sp) },
+                placeholder = { Text("Buscar ejercicios...", color = OnSurfaceVariant, fontSize = 14.sp) },
                 modifier = Modifier.fillMaxSize(),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.Transparent,
@@ -136,7 +212,7 @@ fun ExerciseLibraryScreen(
         
         Spacer(modifier = Modifier.height(24.dp))
         
-        val filters = listOf("All", "waist", "chest", "back", "cardio", "upper arms", "lower arms", "upper legs", "lower legs", "shoulders")
+        val filters = listOf("Todo", "waist", "chest", "back", "cardio", "upper arms", "lower arms", "upper legs", "lower legs", "shoulders")
         LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             items(filters) { filter ->
                 val isSelected = filter == selectedFilter
@@ -149,7 +225,7 @@ fun ExerciseLibraryScreen(
                 ) {
                     Box(modifier = Modifier.padding(horizontal = 20.dp), contentAlignment = Alignment.Center) {
                         Text(
-                            text = filter.uppercase(),
+                            text = (if(filter == "Todo") "TODO" else filter).uppercase(),
                             color = if (isSelected) Background else OnSurface,
                             fontWeight = FontWeight.Bold,
                             fontSize = 11.sp
@@ -161,10 +237,9 @@ fun ExerciseLibraryScreen(
         
         Spacer(modifier = Modifier.height(24.dp))
         
-        // El grid de ejercicios optimizado con LazyColumn
         if (exercises.isEmpty() && !isLoading) {
             Box(modifier = Modifier.fillMaxWidth().padding(top = 40.dp), contentAlignment = Alignment.Center) {
-                Text("No exercises found. Tap the Refresh button above.", color = OnSurfaceVariant, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                Text("No se encontraron ejercicios. Pulsa el botón de actualizar arriba.", color = OnSurfaceVariant, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
             }
         } else {
             val chunkedExercises = remember(exercises) { exercises.chunked(2) }
@@ -182,9 +257,11 @@ fun ExerciseLibraryScreen(
                                 title = exercise.name, 
                                 category = exercise.bodyPart, 
                                 gifUrl = exercise.gifUrl,
-                                imageLoader = imageLoader,
                                 color = exercise.accentColor ?: BrightBlue,
-                                onClick = { onExerciseClick(exercise.id) }
+                                onClick = { 
+                                    selectedExercise = exercise
+                                    showSheet = true
+                                }
                             )
                         }
                         if (pair.size == 1) Spacer(Modifier.weight(1f))
@@ -196,15 +273,57 @@ fun ExerciseLibraryScreen(
 }
 
 @Composable
+fun ExercisePlaceholder(category: String, equipment: String, color: Color) {
+    val icon = when {
+        equipment.contains("dumbbell") -> Icons.Default.FitnessCenter
+        equipment.contains("barbell") -> Icons.Default.FitnessCenter
+        equipment.contains("cable") -> Icons.Default.SyncAlt
+        equipment.contains("bench") -> Icons.Default.Chair
+        equipment.contains("body weight") -> Icons.Default.DirectionsRun
+        else -> Icons.Default.FitnessCenter
+    }
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            icon,
+            contentDescription = null,
+            tint = color.copy(alpha = 0.2f),
+            modifier = Modifier.size(64.dp)
+        )
+        Text(
+            category.uppercase(),
+            color = color.copy(alpha = 0.4f),
+            fontWeight = FontWeight.Black,
+            fontSize = 14.sp
+        )
+        Text(
+            equipment.uppercase(),
+            color = color.copy(alpha = 0.2f),
+            fontWeight = FontWeight.Bold,
+            fontSize = 10.sp
+        )
+    }
+}
+
+@Composable
 fun SmallExerciseCard(
     modifier: Modifier = Modifier,
     title: String,
     category: String,
+    equipment: String = "body weight",
     gifUrl: String,
-    imageLoader: ImageLoader,
     color: Color,
     onClick: () -> Unit
 ) {
+    val context = LocalContext.current
+    // Obtener el loader de la aplicación que ya tiene configurado el GifDecoder
+    val imageLoader = (context.applicationContext as? coil.ImageLoaderFactory)?.newImageLoader() 
+        ?: coil.ImageLoader.Builder(context).build()
+
     Card(
         modifier = modifier
             .height(230.dp)
@@ -223,7 +342,8 @@ fun SmallExerciseCard(
                 if (gifUrl.isNotEmpty()) {
                     SubcomposeAsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)
-                            .data(gifUrl)
+                            .data(gifUrl.replace("http://", "https://"))
+                            .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36")
                             .crossfade(true)
                             .build(),
                         imageLoader = imageLoader,
@@ -237,29 +357,20 @@ fun SmallExerciseCard(
                             ) {
                                 CircularProgressIndicator(
                                     modifier = Modifier.size(24.dp),
-                                    color = BrightLime.copy(alpha = 0.5f),
+                                    color = color.copy(alpha = 0.5f),
                                     strokeWidth = 2.dp
                                 )
                             }
                         },
                         error = {
-                            Box(
-                                modifier = Modifier.fillMaxSize().background(Color.LightGray.copy(alpha = 0.05f)),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    Icons.Default.BrokenImage,
-                                    contentDescription = "Error loading image",
-                                    tint = OnSurfaceVariant.copy(alpha = 0.3f),
-                                    modifier = Modifier.size(32.dp)
-                                )
-                            }
+                            ExercisePlaceholder(category, equipment, color)
                         }
                     )
                 } else {
-                    Icon(Icons.Default.FitnessCenter, contentDescription = null, tint = Background.copy(alpha = 0.2f), modifier = Modifier.size(48.dp))
+                    ExercisePlaceholder(category, equipment, color)
                 }
             }
+// ... resto del Column
             Column(modifier = Modifier.padding(12.dp)) {
                 Text(
                     text = title, 

@@ -24,6 +24,7 @@ import com.ejemplo.myapp.ui.viewmodels.ProfileViewModel
 @Composable
 fun ProfileScreen(
     onSettingsClick: () -> Unit,
+    onHistoryClick: () -> Unit,
     viewModel: ProfileViewModel = viewModel()
 ) {
     val stats by viewModel.stats.collectAsState()
@@ -92,13 +93,15 @@ fun ProfileScreen(
                    RecapDivider()
                    ProfileStat(stats.calories, "CALORIES")
                    RecapDivider()
+                   ProfileStat(if(stats.totalVolume > 1000) "${String.format("%.1f", stats.totalVolume/1000)}k" else "${stats.totalVolume.toInt()}", "VOLUME")
+                   RecapDivider()
                    ProfileStat("${stats.goalReached}%", "GOAL")
                 }
             }
         }
         
         Column(modifier = Modifier.padding(horizontal = 24.dp)) {
-            SectionHeader("Weekly Gains", "History")
+            SectionHeader("Weekly Gains", "History", onActionClicked = onHistoryClick)
             // ... Rest of the UI remains focused on the state
             Card(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp),
@@ -112,7 +115,10 @@ fun ProfileScreen(
                         fontSize = 14.sp
                     )
                     Spacer(modifier = Modifier.height(24.dp))
-                    ProgressChart(modifier = Modifier.fillMaxWidth().height(140.dp))
+                    ProgressChart(
+                        modifier = Modifier.fillMaxWidth().height(140.dp),
+                        data = stats.weeklyVolume
+                    )
                 }
             }
             // Badge section etc.

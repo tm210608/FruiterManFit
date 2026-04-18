@@ -37,17 +37,17 @@ fun DashboardScreen(
         ) {
             StatCard(
                 modifier = Modifier.weight(1f),
-                label = "This Week",
-                value = "4/5",
-                bottomText = "Workouts Done",
+                label = "Esta Semana",
+                value = "${stats.weeklySessionsCount}/${stats.weeklyGoal}",
+                bottomText = "Entrenos Hechos",
                 containerColor = Surface,
                 valueColor = BrightBlue,
                 icon = null
             )
             StatCard(
                 modifier = Modifier.weight(1f),
-                label = "Streak",
-                value = "${stats.streak} DAYS",
+                label = "Racha",
+                value = "${stats.streak} DÍAS",
                 bottomText = null,
                 containerColor = BrightLime,
                 valueColor = Background,
@@ -58,7 +58,7 @@ fun DashboardScreen(
         
         Spacer(modifier = Modifier.height(32.dp))
         
-        SectionHeader("Today's Workout", "See All", onActionClicked = onSeeAllPlans)
+        SectionHeader("Entreno de Hoy", "Ver Todo", onActionClicked = onSeeAllPlans)
         
         FeaturedWorkoutCard(
             title = workout.title,
@@ -68,10 +68,15 @@ fun DashboardScreen(
         )
         
         Spacer(modifier = Modifier.height(32.dp))
-        SectionHeader("Next Up")
-        ActivityItem("Morning Mobility", "Starts in 2 hours", Icons.Default.Schedule, BrightBlue)
+        
+        SectionHeader("Progreso de Fuerza", "Volumen")
+        VolumeChart(weeklyVolume = stats.weeklyVolume)
+
+        Spacer(modifier = Modifier.height(32.dp))
+        SectionHeader("Siguiente")
+        ActivityItem("Movilidad Mañana", "En 2 horas", Icons.Default.Schedule, BrightBlue)
         Spacer(modifier = Modifier.height(12.dp))
-        ActivityItem("Nutrition Log", "Update required", Icons.Default.Balance, BrightLime)
+        ActivityItem("Registro Nutrición", "Pendiente", Icons.Default.Balance, BrightLime)
         
         Spacer(modifier = Modifier.height(100.dp))
     }

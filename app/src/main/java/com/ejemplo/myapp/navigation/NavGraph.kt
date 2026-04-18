@@ -64,6 +64,11 @@ fun SetupNavGraph(
                 onExerciseClick = { exerciseId ->
                     navController.navigate(Screen.ExerciseDetail.createRoute(exerciseId))
                 },
+                onAddExercise = { exerciseId ->
+                    sessionViewModel.addExerciseById(exerciseId)
+                    // Notificamos visualmente que se añadió, o navegamos a la sesión
+                    navController.navigate(Screen.Session.route)
+                },
                 viewModel = viewModel
             )
         }
@@ -77,7 +82,14 @@ fun SetupNavGraph(
             ExerciseDetailScreen(
                 exerciseId = exerciseId,
                 repository = detailViewModel.repository,
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                onStartExercise = { id ->
+                    sessionViewModel.addExerciseById(id)
+                    navController.navigate(Screen.Session.route) {
+                        popUpTo(Screen.Home.route) { saveState = true }
+                        launchSingleTop = true
+                    }
+                }
             )
         }
         composable(Screen.Session.route) {
@@ -97,6 +109,9 @@ fun SetupNavGraph(
             val viewModel: ExerciseLibraryViewModel = hiltViewModel()
             ExerciseLibraryScreen(
                 onExerciseClick = { exerciseId ->
+                    navController.navigate(Screen.ExerciseDetail.createRoute(exerciseId))
+                },
+                onAddExercise = { exerciseId ->
                     sessionViewModel.addExerciseById(exerciseId)
                     navController.popBackStack()
                 },
@@ -110,6 +125,7 @@ fun SetupNavGraph(
             val viewModel: ProfileViewModel = hiltViewModel()
             ProfileScreen(
                 onSettingsClick = { navController.navigate(Screen.Settings.route) },
+                onHistoryClick = { navController.navigate(Screen.History.route) },
                 viewModel = viewModel
             )
         }
@@ -121,6 +137,13 @@ fun SetupNavGraph(
                         popUpTo(0) { inclusive = true }
                     }
                 }
+            )
+        }
+        composable(Screen.History.route) {
+            val detailViewModel: ExerciseDetailViewModel = hiltViewModel() // Using detailViewModel for repo access or create a dedicated one
+            HistoryScreen(
+                repository = detailViewModel.repository,
+                onBack = { navController.popBackStack() }
             )
         }
     }
