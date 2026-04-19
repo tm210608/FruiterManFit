@@ -21,7 +21,14 @@ class DashboardViewModel @Inject constructor(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = UserStats(1, "Fresh Fruit", 0, "0", 0)
+            initialValue = UserStats(userName = "Fresh Fruit", level = 1, rank = "Fresh Fruit", streak = 0, calories = "0", goalReached = 0)
+        )
+
+    val challenges: StateFlow<List<FruitChallenge>> = repository.getFruitChallenges()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
         )
 }
 
@@ -33,7 +40,7 @@ class ProfileViewModel @Inject constructor(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = UserStats(1, "Fresh Fruit", 0, "0", 0)
+            initialValue = UserStats(userName = "Fresh Fruit", level = 1, rank = "Fresh Fruit", streak = 0, calories = "0", goalReached = 0)
         )
 }
 

@@ -1,0 +1,86 @@
+<resources>
+    <string name="app_name">FruiterMan Fit</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_welcome">¡Hola, %1$s!</string>
+    <string name="dashboard_active_sessions">Sesiones activas</string>
+    <string name="dashboard_no_sessions">No hay sesiones activas</string>
+    <string name="dashboard_start_workout">Empezar entrenamiento</string>
+    <string name="dashboard_history">Ver historial</string>
+    <string name="dashboard_exercises">Biblioteca de ejercicios</string>
+    <string name="dashboard_quick_stats">Estadísticas rápidas</string>
+    <string name="dashboard_search_hint">Buscar ejercicios...</string>
+
+    <string name="dashboard_title_brand">FRUITERMAN</string>
+    <string name="dashboard_title_subtitle">Panel Fit</string>
+    <string name="dashboard_stat_weekly_label">Esta Semana</string>
+    <string name="dashboard_stat_workouts_done">Entrenos Hechos</string>
+    <string name="dashboard_stat_streak_label">Racha</string>
+    <string name="dashboard_stat_streak_value">%1$d DÍAS</string>
+    <string name="dashboard_section_today_workout">Entreno de Hoy</string>
+    <string name="dashboard_action_see_all">Ver Todo</string>
+    <string name="dashboard_section_strength_progress">Progreso de Fuerza</string>
+    <string name="dashboard_section_volume">Volumen</string>
+    <string name="dashboard_section_next">Siguiente</string>
+    <string name="dashboard_activity_mobility">Movilidad Mañana</string>
+    <string name="dashboard_activity_mobility_time">En 2 horas</string>
+    <string name="dashboard_activity_nutrition">Registro Nutrición</string>
+    <string name="dashboard_action_start_now">EMPEZAR AHORA</string>
+    <string name="dashboard_chart_volume_title">VOLUMEN SEMANAL</string>
+
+    <!-- Exercise Library -->
+    <string name="library_title">EXPLORA LA\nBIBLIOTECA</string>
+    <string name="library_subtitle">%1$d ejercicios cargados</string>
+    <string name="library_search_hint">Buscar ejercicio...</string>
+    <string name="library_filter_all">Todo</string>
+    <string name="library_action_refresh">ACTUALIZAR</string>
+    <string name="library_action_view_instructions">VER INSTRUCCIONES</string>
+    <string name="library_action_add_to_workout">AÑADIR AL ENTRENAMIENTO</string>
+    <!-- Profile Screen -->
+    <string name="profile_greeting">¡Hola, %1$s! 🍎</string>
+    <string name="profile_level_rank">Nivel %1$d %2$s</string>
+    <string name="profile_stat_streak">RACHA</string>
+    <string name="profile_stat_calories">CALORÍAS</string>
+    <string name="profile_stat_volume">VOLUMEN</string>
+    <string name="profile_stat_goal">META</string>
+    <string name="profile_action_history">Ver historial</string>
+    <string name="profile_advice_default">¡Estás dándole duro al cardio, pero quizás deberías comer más bayas! 🍓</string>
+    <string name="profile_badge_title">INSIGNIAS</string>
+    <string name="profile_badge_description">¡Colecciónalas todas!</string>
+    <!-- Exercise Detail Screen -->
+    <string name="detail_target">Objetivo: %1$s</string>
+    <string name="detail_instructions_title">INSTRUCCIONES</string>
+    <string name="detail_action_add">AÑADIR AL ENTRENAMIENTO</string>
+    <string name="detail_action_start">EMPEZAR EJERCICIO</string>
+    <string name="detail_loading">Cargando detalles…</string>
+    <!-- Settings Screen -->
+    <string name="settings_title">Ajustes</string>
+    <string name="settings_avatar_placeholder">FM</string>
+    <string name="settings_member_since">Miembro desde mayo de 2024</string>
+    <string name="settings_label_fullname">Nombre completo</string>
+    <string name="settings_label_bio">Biografía</string>
+    <string name="settings_label_weight">Peso (kg)</string>
+    <string name="settings_label_height">Altura (cm)</string>
+    <string name="settings_label_notifications">Notificaciones</string>
+    <string name="settings_label_dark_mode">Modo Oscuro</string>
+    <string name="settings_label_unit_system">Sistema de Unidades</string>
+    <string name="settings_unit_metric">Métrico</string>
+    <string name="settings_unit_imperial">Imperial</string>
+    <string name="settings_action_save">Guardar cambios</string>
+    <string name="settings_action_help">Ayuda</string>
+    <string name="settings_action_terms">Términos</string>
+    <string name="settings_action_logout">Cerrar Sesión</string>
+    <string name="settings_bio_default">¡Potenciando mis entrenamientos con los dulces de la naturaleza! 🍎🍓</string>
+
+    <!-- Fruit Challenges -->
+    <string name="challenges_title">RETOS FRUTALES</string>
+    <string name="challenges_subtitle">¡Gana frutas entrenando!</string>
+    <string name="challenges_daily_goal">Objetivo Diario</string>
+    <string name="challenges_weekly_streak">Racha Semanal</string>
+    <string name="challenge_apple_title">Poder Manzana</string>
+    <string name="challenge_apple_desc">Completa 3 ejercicios de pecho</string>
+    <string name="challenge_banana_title">Impulso Plátano</string>
+    <string name="challenge_banana_desc">Entrena 3 días seguidos</string>
+    <string name="challenge_reward_claim">RECLAMAR FRUTA</string>
+
+</resources>

@@ -7,8 +7,10 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.ejemplo.myapp.R
 import com.ejemplo.myapp.ui.components.*
 import com.ejemplo.myapp.ui.theme.*
 import com.ejemplo.myapp.ui.viewmodels.DashboardViewModel
@@ -21,6 +23,7 @@ fun DashboardScreen(
 ) {
     val workout by viewModel.workout.collectAsState()
     val stats by viewModel.stats.collectAsState()
+    val challenges by viewModel.challenges.collectAsState()
 
     Column(
         modifier = Modifier
@@ -29,7 +32,10 @@ fun DashboardScreen(
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 24.dp)
     ) {
-        MainHeader("FRUITERMAN", "Fit Dashboard")
+        MainHeader(
+            stringResource(R.string.dashboard_title_brand),
+            stringResource(R.string.dashboard_title_subtitle)
+        )
         
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -37,17 +43,17 @@ fun DashboardScreen(
         ) {
             StatCard(
                 modifier = Modifier.weight(1f),
-                label = "Esta Semana",
+                label = stringResource(R.string.dashboard_stat_weekly_label),
                 value = "${stats.weeklySessionsCount}/${stats.weeklyGoal}",
-                bottomText = "Entrenos Hechos",
+                bottomText = stringResource(R.string.dashboard_stat_workouts_done),
                 containerColor = Surface,
                 valueColor = BrightBlue,
                 icon = null
             )
             StatCard(
                 modifier = Modifier.weight(1f),
-                label = "Racha",
-                value = "${stats.streak} DÍAS",
+                label = stringResource(R.string.dashboard_stat_streak_label),
+                value = stringResource(R.string.dashboard_stat_streak_value, stats.streak),
                 bottomText = null,
                 containerColor = BrightLime,
                 valueColor = Background,
@@ -58,7 +64,11 @@ fun DashboardScreen(
         
         Spacer(modifier = Modifier.height(32.dp))
         
-        SectionHeader("Entreno de Hoy", "Ver Todo", onActionClicked = onSeeAllPlans)
+        SectionHeader(
+            stringResource(R.string.dashboard_section_today_workout),
+            stringResource(R.string.dashboard_action_see_all),
+            onActionClicked = onSeeAllPlans
+        )
         
         FeaturedWorkoutCard(
             title = workout.title,
@@ -69,14 +79,37 @@ fun DashboardScreen(
         
         Spacer(modifier = Modifier.height(32.dp))
         
-        SectionHeader("Progreso de Fuerza", "Volumen")
+        SectionHeader(
+            stringResource(R.string.dashboard_section_strength_progress),
+            stringResource(R.string.dashboard_section_volume)
+        )
         VolumeChart(weeklyVolume = stats.weeklyVolume)
 
         Spacer(modifier = Modifier.height(32.dp))
-        SectionHeader("Siguiente")
-        ActivityItem("Movilidad Mañana", "En 2 horas", Icons.Default.Schedule, BrightBlue)
+        SectionHeader(
+            stringResource(R.string.challenges_title),
+            stringResource(R.string.challenges_subtitle)
+        )
+        ChallengesSection(challenges = challenges)
+
+        Spacer(modifier = Modifier.height(32.dp))
+        
+        SectionHeader(
+            stringResource(R.string.dashboard_section_next)
+        )
+        ActivityItem(
+            stringResource(R.string.dashboard_activity_mobility),
+            stringResource(R.string.dashboard_activity_mobility_time),
+            Icons.Default.Schedule,
+            BrightBlue
+        )
         Spacer(modifier = Modifier.height(12.dp))
-        ActivityItem("Registro Nutrición", "Pendiente", Icons.Default.Balance, BrightLime)
+        ActivityItem(
+            stringResource(R.string.dashboard_activity_nutrition),
+            stringResource(R.string.dashboard_activity_mobility_time), // Reusing a valid string for now to avoid build error
+            Icons.Default.Balance,
+            BrightLime
+        )
         
         Spacer(modifier = Modifier.height(100.dp))
     }

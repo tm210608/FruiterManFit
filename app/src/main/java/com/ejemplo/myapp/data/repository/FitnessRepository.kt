@@ -19,6 +19,31 @@ class FitnessRepository @Inject constructor(
     private val exerciseApiService: ExerciseApiService
 ) {
     
+    // Fruit Challenges
+    fun getFruitChallenges(): Flow<List<FruitChallenge>> {
+        return fitnessDao.getAllChallenges().map { entities ->
+            if (entities.isEmpty()) {
+                val initial = listOf(
+                    FruitChallengeEntity("1", "Apple Power", "Complete 3 chest exercises", "APPLE", 0f, 3f, false, "DAILY"),
+                    FruitChallengeEntity("2", "Banana Boost", "Train 3 days in a row", "BANANA", 1f, 3f, false, "WEEKLY")
+                )
+                fitnessDao.insertChallenges(initial)
+                initial.map { it.toDomain() }
+            } else {
+                entities.map { it.toDomain() }
+            }
+        }
+    }
+
+    private fun FruitChallengeEntity.toDomain() = FruitChallenge(
+        id = id,
+        title = title,
+        description = description,
+        icon = iconType,
+        progress = progress / target,
+        isCompleted = isCompleted
+    )
+
     // Exercises from Local DB
     fun getExercises(): Flow<List<Exercise>> {
         return fitnessDao.getAllExercises().map { entities ->
@@ -48,7 +73,7 @@ class FitnessRepository @Inject constructor(
                 .distinctBy { it.id }
                 .map { it.toEntity() }
             
-            fitnessDao.clearExercises() // Limpiamos para asegurar que las nuevas URLs de imagen se guarden
+            fitnessDao.clearExercises() 
             fitnessDao.insertExercises(entities)
             val finalCount = fitnessDao.getExerciseCount()
             Log.d("FruiterMan", "Sincronización finalizada. Total real en BD: $finalCount")
@@ -103,17 +128,18 @@ class FitnessRepository @Inject constructor(
 
     // Dashboard Data - Calculated from Room
     fun getRealUserStats(): Flow<UserStats> {
-        return fitnessDao.getFullSessions().map { fullSessions ->
+        return combine(
+            fitnessDao.getFullSessions(),
+            fitnessDao.getUser()
+        ) { fullSessions, user ->
             val totalCalories = fullSessions.sumOf { it.session.totalCalories }
             val sessionCount = fullSessions.size
             
-            // Calculate total volume from all done sets in all sessions
             val allSets = fullSessions.flatMap { session -> 
                 session.exercises.flatMap { it.sets }
             }
             val totalVolume = allSets.filter { it.isDone }.sumOf { it.weight * it.reps }
             
-            // Calculate Weekly Volume and Session Count (last 7 days)
             val now = System.currentTimeMillis()
             val dayMillis = 24 * 60 * 60 * 1000L
             val weekStart = now - (7 * dayMillis)
@@ -134,8 +160,9 @@ class FitnessRepository @Inject constructor(
             }
 
             UserStats(
+                userName = user?.name ?: "Fresh Fruit",
                 level = (sessionCount / 5) + 1,
-                rank = when {
+                rank = user?.rank ?: when {
                     sessionCount > 50 -> "Fruit Legend"
                     sessionCount > 20 -> "Fruit Ninja"
                     else -> "Fresh Fruit"
@@ -146,7 +173,7 @@ class FitnessRepository @Inject constructor(
                 totalVolume = totalVolume,
                 weeklyVolume = weeklyVolume,
                 weeklySessionsCount = weeklySessionsCount,
-                weeklyGoal = 5 // Meta por defecto
+                weeklyGoal = user?.weeklyGoal ?: 5
             )
         }
     }
@@ -213,10 +240,7 @@ class FitnessRepository @Inject constructor(
         equipment = (equipment ?: "body weight").lowercase(),
         gifUrl = if (!images.isNullOrEmpty()) {
             val imagePath = images[0]
-            // El README indica: https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/
-            // El JSON ya trae "Ab_Roller/0.jpg", así que solo concatenamos el base URL correcto.
             val url = "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/$imagePath"
-            android.util.Log.d("FruiterMan", "Mapeando imagen: $imagePath -> $url")
             url
         } else {
             gifUrl?.replace("http://", "https://") ?: ""

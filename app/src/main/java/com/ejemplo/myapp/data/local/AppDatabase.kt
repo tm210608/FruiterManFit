@@ -8,15 +8,19 @@ import androidx.room.TypeConverters
 import com.ejemplo.myapp.data.local.converters.StringListConverter
 import com.ejemplo.myapp.data.local.dao.FitnessDao
 import com.ejemplo.myapp.data.local.entities.*
+import com.ejemplo.myapp.data.local.DatabaseConfig
+import com.ejemplo.myapp.data.local.MigrationProvider
 
 @Database(
     entities = [
         ExerciseEntity::class,
         WorkoutSessionEntity::class,
         SessionExerciseEntity::class,
-        ExerciseSetEntity::class
+        ExerciseSetEntity::class,
+        UserEntity::class,
+        FruitChallengeEntity::class
     ],
-    version = 3, // Incrementamos a 3 para forzar la recreación tras los cambios de esquema
+    version = DatabaseConfig.DATABASE_VERSION,
     exportSchema = false
 )
 @TypeConverters(StringListConverter::class)
@@ -32,9 +36,9 @@ abstract class AppDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "fruiterman_database"
+                    DatabaseConfig.DATABASE_NAME
                 )
-                .fallbackToDestructiveMigration() // Esto evita que la app se cierre si cambias el esquema
+                .addMigrations(*MigrationProvider.allMigrations)
                 .build()
                 INSTANCE = instance
                 instance

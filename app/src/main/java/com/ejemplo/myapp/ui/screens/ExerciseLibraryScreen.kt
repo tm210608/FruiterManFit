@@ -21,6 +21,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
+import androidx.compose.ui.res.stringResource
+import com.ejemplo.myapp.R
 import com.ejemplo.myapp.ui.theme.*
 import com.ejemplo.myapp.ui.viewmodels.ExerciseLibraryViewModel
 
@@ -111,7 +113,7 @@ fun ExerciseLibraryScreen(
                 ) {
                     Icon(Icons.Default.Info, contentDescription = null, tint = BrightBlue)
                     Spacer(modifier = Modifier.width(12.dp))
-                    Text("VER INSTRUCCIONES", color = OnSurface, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.library_action_view_instructions), color = OnSurface, fontWeight = FontWeight.Bold)
                 }
                 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -127,7 +129,7 @@ fun ExerciseLibraryScreen(
                 ) {
                     Icon(Icons.Default.Add, contentDescription = null, tint = Background)
                     Spacer(modifier = Modifier.width(12.dp))
-                    Text("AÑADIR AL ENTRENAMIENTO", color = Background, fontWeight = FontWeight.Black)
+                    Text(stringResource(R.string.library_action_add_to_workout), color = Background, fontWeight = FontWeight.Black)
                 }
             }
         }
@@ -148,13 +150,13 @@ fun ExerciseLibraryScreen(
         ) {
             Column {
                 Text(
-                    text = "EXPLORA LA\nBIBLIOTECA",
+                    text = stringResource(R.string.library_title),
                     fontSize = 36.sp,
                     fontWeight = FontWeight.Black,
                     lineHeight = 34.sp
                 )
                 Text(
-                    text = "${exercises.size} Ejercicios Cargados",
+                    text = stringResource(R.string.library_subtitle, exercises.size),
                     color = BrightLime,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold

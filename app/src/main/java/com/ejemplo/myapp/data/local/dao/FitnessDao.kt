@@ -46,6 +46,23 @@ interface FitnessDao {
 
     @Delete
     suspend fun deleteSet(set: ExerciseSetEntity)
+
+    // User Profile
+    @Query("SELECT * FROM users WHERE id = 1")
+    fun getUser(): Flow<UserEntity?>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertUser(user: UserEntity)
+
+    // Fruit Challenges
+    @Query("SELECT * FROM fruit_challenges")
+    fun getAllChallenges(): Flow<List<FruitChallengeEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertChallenges(challenges: List<FruitChallengeEntity>)
+
+    @Query("UPDATE fruit_challenges SET progress = :progress, isCompleted = :isCompleted WHERE id = :id")
+    suspend fun updateChallengeProgress(id: String, progress: Float, isCompleted: Boolean)
 }
 
 data class SessionExerciseWithSets(

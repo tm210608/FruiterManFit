@@ -1,0 +1,316 @@
+Usuario: Hola. Necesito que me busques las mejores páginas o lugares dónde puedo encontrar APIS para conectar mi App de Android. La app tiene temática de ejercicios de gimnasio. Necesito que la API contenga tipos de ejercicios, zonas del cuerpo que trabaja, GIFS o vídeo muy cortos explicativos del ejercicio en cuestión (y que pesen pocos bytes para no sobrecargar la app), etc. Inspírate en la App que está en las diferentes plataformas (App Store o Google Play) que se llama Hevy. Y un par de preguntas, ¿habría alguna forma de crear una API similar propia?¿u otra forma de crear ésas referencias de ejercicios para la app tipo API?
+
+Asistente: Resumen rápido: Las mejores opciones listas para integrar son ExerciseDB (open source / comercial), WorkoutX (API con GIFs) y API Ninjas Exercises; Hevy ofrece su propia API para usuarios Pro. Estas cubren ejercicios, músculos, equipamiento y GIFs/videos listos para apps móviles.
+
+Guía breve antes de elegir
+- Decisión clave: ¿priorizas coste (open source), calidad de media (GIFs/MP4) o soporte/SLAs?
+- Consideraciones técnicas: tamaño de archivos (usar GIFs optimizados o MP4 a baja resolución), CDN para servir media, caché local en la app, y paginación/filtrado en la API.
+- Preguntas útiles para afinar la recomendación: ¿quieres contenido gratuito o pagar por licencia; necesitas >1.000 ejercicios; prefieres GIFs o vídeos cortos MP4?
+
+Comparativa rápida de APIs recomendadas
+| API | Contenido | Media | Licencia / coste | Por qué elegirla |
+| ExerciseDB | Ejercicios, músculos, equipo, instrucciones. | GIFs y vídeos; dataset grande. | Open source + opciones comerciales. | Gran dataset listo para prototipos y producción.
+| WorkoutX | ~1,300 ejercicios con metadata completa. | GIFs optimizados; endpoints para gifs. | API key; plan gratuito disponible. | Fácil integración y GIFs listos para móvil.
+| API Ninjas Exercises | 3,000+ ejercicios; filtros por músculo/tipo. | Instrucciones textuales; no foco en GIFs. | API key; modelo de pago por uso. | Amplia cobertura y endpoints de búsqueda robustos.
+| Hevy Public API | Workouts, plantillas, exercise templates (si eres Pro). | No es un catálogo público masivo; orientada a datos de usuario. | Acceso para Hevy Pro; key desde su web. | Útil si quieres sincronizar datos de usuarios Hevy.
+
+¿Puedo crear mi propia API similar?
+Sí. Dos rutas prácticas:
+1. Construir sobre un dataset existente — descargar ExerciseDB/ExerciseDB v1 o packs comerciales (media + JSON), importarlos a tu base (Postgres/NoSQL) y exponer endpoints REST/GraphQL. Ventaja: rapidez; desventaja: coste de hosting y licencias.
+2. Crear contenido propio — grabar vídeos cortos o animaciones, generar GIFs optimizados (baja resolución, 200–400 KB), anotar metadata (músculos, equipo, instrucciones) y servir desde CDN. Ventaja: control total; desventaja: tiempo y coste de producción.
+
+Alternativas y recomendaciones técnicas
+- Optimiza media: usa MP4 H.264 a baja resolución o GIFs convertidos a WebP/MP4 para reducir bytes. Cachea en la app y usa lazy-loading.
+- Modelo híbrido: usa una API pública para la mayoría de ejercicios y añade tus propios vídeos para ejercicios exclusivos.
+- Legal y calidad: revisa licencias (open source vs comercial) antes de publicar.
+
+Riesgos y limitaciones
+- Tamaño de media puede afectar UX y datos móviles; prueba con usuarios reales.
+- Licencias: algunos datasets requieren pago o atribución.
+- Disponibilidad: APIs gratuitas pueden tener límites o cambios; planifica caché y fallback.
+
+Si quieres, preparo un plan técnico paso a paso (endpoints sugeridos, esquema JSON, estrategia de media y ejemplo de caché local) o descargo y pruebo ExerciseDB/WorkoutX para mostrar cómo quedaría integrado en tu app Android. ¿Cuál prefieres que explore primero?
+
+Usuario: Que me recomiendas? Mi App es de prueba, siguiendo los estándares de Google para Android con Jetpack Compose
+
+Asistente: Comparativa rápida (atributos clave)
+| Fuente | Cobertura ejercicios | Media (GIF/Video) | Coste / licencia | Facilidad integración |
+| ExerciseDB / Wger | Ejercicios, músculos, equipo | GIFs y vídeos en algunos forks | Open source / opciones comerciales | Alta; datos listos para importar
+| API-Ninjas Exercises / RapidAPI | Miles de ejercicios; filtros | Algunos endpoints con media | Pago por uso / planes gratuitos limitados | Muy fácil (REST + API key)
+| Hevy (si accedes a Pro) | Workouts y plantillas de usuario | Orientado a datos de usuario; media limitada | Acceso según plan Hevy | Útil para sincronizar usuarios Hevy
+| Crear propia (mixta) | Total control; puedes añadir solo lo que necesites | MP4/H.264 o WebP/GIF optimizados | Coste de producción + hosting | Flexible; requiere más trabajo inicial
+
+Recomendación inmediata (para una app de prueba con Jetpack Compose)
+- Prototipo rápido: usa un dataset open source (p. ej. Wger / ExerciseDB) para poblar tu backend y combina con un proveedor de media (CDN o almacenamiento en la nube).
+- Si quieres velocidad: integra una API pública vía RapidAPI o API-Ninjas para obtener ejercicios y texto; añade tus propios vídeos cortos solo para los ejercicios clave.
+- Si quieres control y escalabilidad: crea tu propia API ligera (REST/GraphQL) y sirve media desde un CDN; así controlas calidad, tamaño y licencias.
+
+Plan técnico paso a paso para prototipo (6 pasos)
+1. Importar dataset: descarga un dataset open source de ejercicios y normaliza a tu esquema (ejercicio, músculos, equipo, nivel, variantes).
+2. Backend mínimo: monta un servicio REST con endpoints: /exercises, /exercises/{id}, /muscles, /search. Tech sugerida: FastAPI o Node/Express.
+3. Media optimizada: usa MP4 H.264 a baja resolución (240–360p) o WebP/animated; objetivo: <200–400 KB por clip si es posible. Almacena en Cloud Storage + CDN.
+4. Cache y paginación: implementa paginación en backend y caché HTTP (ETag/Cache-Control). En la app, cache local con Room/Datastore.
+5. Integración Android (Jetpack Compose): carga imágenes/GIFs con Coil; para vídeos cortos usa ExoPlayer con reproducción inline y preload.
+6. Pruebas y métricas: mide tamaño medio por pantalla, tiempo de carga y consumo de datos; ajusta resolución y compresión.
+
+Esquema API sugerido y ejemplo JSON
+Endpoints clave: GET /exercises?muscle=chest&equipment=dumbbell&page=1, GET /exercises/{id}, GET /muscles, GET /media/{mediaId}
+Ejemplo JSON (respuesta /exercises/{id}):
+{
+  "id": "pushup_standard",
+  "name": "Push Up",
+  "description": "Empuja el cuerpo hacia arriba manteniendo la espalda recta.",
+  "primary_muscles": ["pectoralis_major", "triceps"],
+  "secondary_muscles": ["anterior_deltoid", "core"],
+  "equipment": ["bodyweight"],
+  "difficulty": "beginner",
+  "media": {
+    "thumbnail": "https://cdn.example.com/thumbs/pushup.webp",
+    "clip": "https://cdn.example.com/clips/pushup_240p.mp4",
+    "duration_ms": 3000,
+    "size_bytes": 120000
+  },
+  "steps": ["Colócate en posición de plancha", "Flexiona codos hasta 90°", "Empuja hasta extender brazos"]
+}
+
+Estrategia de media y optimización (crítica para móvil)
+- Formato recomendado: MP4 (H.264) para vídeo; WebP o animated WebP para animaciones tipo GIF.
+- Tamaño objetivo: 100–400 KB por clip; si no es posible, ofrecer varias calidades y elegir según red.
+- CDN + Signed URLs: sirve media desde CDN y usa URLs firmadas para control de acceso.
+- Pre-caching inteligente: cachea miniaturas y metadatos; descarga clips bajo demanda o en background cuando el usuario esté en Wi‑Fi.
+- Transcodificación: genera varias resoluciones (240p, 360p) y selecciona según ancho de banda.
+
+Stack recomendado para prototipo (rápido y compatible)
+- Backend: FastAPI (Python) o Node/Express.
+- Base de datos: PostgreSQL o Firestore.
+- Almacenamiento media: Firebase Storage o AWS S3 + CloudFront.
+- Autenticación: Firebase Auth o Auth0.
+- Android: Jetpack Compose + Coil + ExoPlayer + Room.
+- Despliegue: Vercel/Render para backend ligero o Heroku; usar CI/CD para builds.
+
+Licencias, riesgos y recomendaciones finales
+- Licencias: verifica la licencia del dataset (atribución, uso comercial).
+- UX: prioriza tiempos de carga y consumo de datos; ofrece opción “baja calidad” y descarga solo en Wi‑Fi.
+- Escalabilidad: para producción, añade CDN, límites de rate, y monitorización (Sentry, Prometheus).
+
+Usuario: Estuve probando con ExerciseDB pero me está dando muchos problemas para cargar los ejercicios y me ha sido imposible que se vean los GIFS demostrativos, posiblemente por restricciones de la API
+
+Asistente: Entiendo el problema. Suena a que los GIFs no se sirven correctamente desde ExerciseDB (URLs bloqueadas, CORS, hotlinking, límites o media inexistente). Te doy una lista práctica de comprobaciones y soluciones concretas —incluyendo código— para que puedas resolverlo rápido en tu app Jetpack Compose.
+
+Comprobaciones rápidas (prioritarias)
+- URL de media: Abrir la URL del GIF en el navegador; comprobar que devuelve el archivo y no una página HTML o 403/404.
+- CORS / Hotlinking: Si la URL falla en la app pero funciona en navegador, puede ser CORS o bloqueo por referer.
+- Rate limits / API key: Revisa cabeceras de respuesta y documentación: 429 o mensajes en JSON.
+- Formato real: A veces la API devuelve un enlace a un viewer, no al archivo bruto.
+- Tamaño y tiempo de carga: GIFs grandes tardan o fallan en móviles; medir bytes y latencia.
+
+Soluciones técnicas ordenadas por impacto
+1. Servir media desde tu backend (proxy)
+- Por qué: evita CORS, hotlinking y te permite transcodificar/optimizar antes de enviar a la app.
+- Cómo: tu backend descarga el GIF original, lo convierte a MP4/WebP optimizado y lo sirve desde CDN o con URLs firmadas.
+Ejemplo mínimo FastAPI (proxy + reenvío)
+# fastapi_proxy.py
+from fastapi import FastAPI, Response
+import httpx
+
+app = FastAPI()
+
+@app.get("/proxy")
+async def proxy(url: str):
+    async with httpx.AsyncClient(timeout=20.0) as client:
+        r = await client.get(url)
+        if r.status_code != 200:
+            return Response(status_code=502, content="Bad upstream")
+        headers = {"Content-Type": r.headers.get("content-type","application/octet-stream")}
+        return Response(content=r.content, headers=headers)
+
+Mejoras: añadir cache (Redis), límites, transcodificación con ffmpeg y servir desde S3+CDN.
+
+2. Convertir GIFs a MP4 o WebP (server-side)
+Comando ffmpeg para convertir y reducir peso:
+ffmpeg -i input.gif -movflags faststart -pix_fmt yuv420p -vf "scale=iw*min(1\,360/iw):-2" -c:v libx264 -crf 28 -preset veryfast -an output_240p.mp4
+Objetivo: clips de 100–400 KB si es posible; generar varias calidades.
+
+3. Android Jetpack Compose: carga de GIFs y vídeos
+- Imágenes/GIFs: usa Coil con soporte para animated WebP/GIF.
+- Vídeos cortos: usa ExoPlayer para reproducir MP4 inline; evita cargar GIFs pesados en ImageView.
+Ejemplo Coil en Compose
+@Composable
+fun ExerciseThumbnail(url: String, modifier: Modifier = Modifier) {
+  AsyncImage(
+    model = ImageRequest.Builder(LocalContext.current)
+      .data(url)
+      .crossfade(true)
+      .build(),
+    contentDescription = null,
+    modifier = modifier
+  )
+}
+Ejemplo ExoPlayer en Compose
+@Composable
+fun VideoClip(url: String, modifier: Modifier = Modifier) {
+  val context = LocalContext.current
+  val exoPlayer = remember {
+    SimpleExoPlayer.Builder(context).build().apply {
+      setMediaItem(MediaItem.fromUri(url))
+      playWhenReady = false
+      repeatMode = Player.REPEAT_MODE_OFF
+    }
+  }
+  DisposableEffect(Unit) {
+    onDispose { exoPlayer.release() }
+  }
+  AndroidView(factory = {
+    PlayerView(it).apply {
+      player = exoPlayer
+      useController = true
+      layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
+    }
+  }, modifier = modifier)
+}
+
+4. Manejar errores y límites en la app
+- Retries exponenciales para 429/5xx.
+- Fallback local: miniaturas locales o iconos si media no disponible.
+- Descarga condicional: solo descargar clips en Wi‑Fi o cuando usuario lo permita.
+- Cache local: Room para metadatos y cache de archivos con OkHttp cache o DiskLruCache.
+
+5. Verificar headers y redirecciones
+- Algunas URLs devuelven redirecciones 302 a un CDN; OkHttp/Coil las sigue, pero si la API exige cabeceras (User-Agent, Referer) tendrás que replicarlas en tu proxy o en la petición.
+
+Alternativas si ExerciseDB sigue fallando
+- Wger / forks de ExerciseDB: Open source; puedes clonar y hospedar tu propia copia.
+- APIs en RapidAPI / API‑Ninjas: Endpoints más robustos y con media integrada en algunos casos.
+- Crear dataset propio: Control total sobre media y licencias; ideal si quieres calidad y consistencia.
+
+Recomendación práctica para tu app de prueba
+1. Implementa un proxy simple (FastAPI/Node) que valide y reenvíe media; añade cache y logs.
+2. Transcodifica GIFs a MP4 240–360p en el servidor y sirve MP4 desde CDN.
+3. En la app usa Coil para miniaturas y ExoPlayer para clips; implementa cache y descarga bajo demanda.
+4. Si necesitas rapidez, clona el dataset de ExerciseDB/Wger y hospeda tu propia copia para evitar restricciones.
+
+Siguientes pasos que ya puedo preparar para ti
+- Opción A: Código completo de backend (FastAPI) que descarga, convierte con ffmpeg y sube a S3, con caching y endpoints /exercises y /media/{id}.
+- Opción B: Módulo Android (Jetpack Compose) listo para integrar: llamadas Retrofit, Room para cache, Coil config y ExoPlayer ejemplo con control de calidad según red.
+
+Usuario: La verdad es que estoy muy verde en todo éste tema, estoy creando la App con ayuda de un agente de IA, mis conocimientos no alcanzan al tema del backend ni las APIS ni nada de eso
+
+Asistente: Opciones prácticas y recomendación inmediata
+| Opción | Qué incluye | Facilidad para principiante | Por qué elegirla |
+| Firebase (Firestore + Storage) sin backend propio | Almacenas datos de ejercicios en Firestore y clips optimizados en Firebase Storage; sirves desde CDN | Muy alta | No necesitas gestionar servidores; SDKs Android listos; escalable
+| Backend proxy ligero (FastAPI) + S3/CDN | Descargas/optimizas GIFs, los conviertes a MP4 y los subes a S3; tu backend expone API | Media control total; más trabajo | Media optimizada y control de licencias; mejor para producción
+| Usar API de terceros (RapidAPI, API‑Ninjas) | Consumes ejercicios ya listos; algunos incluyen media | Alta | Rápido para prototipos; dependes de terceros y límites/licencias
+
+Recomendación para ti: Firebase. Es la vía más sencilla para alguien sin experiencia en backend, funciona muy bien con Jetpack Compose y te evita lidiar con servidores y CORS. A continuación te doy un plan paso a paso, con ejemplos listos para copiar.
+
+Plan paso a paso para principiantes usando Firebase (rápido y seguro)
+1 Configurar proyecto Firebase: crea proyecto, activa Firestore y Storage, añade app Android y descarga google-services.json.
+2 Estructura de datos recomendada en Firestore: colección exercises → documento por ejercicio. Campos sugeridos: id, name, description, primary_muscles, equipment, difficulty, thumbnailUrl, clipUrl, durationMs, sizeBytes.
+Ejemplo documento JSON incluido.
+3 Preparar media optimizada (sin complicarte demasiado): convertir GIFs a MP4 H.264 o animated WebP con ffmpeg; objetivo 100–400 KB por clip.
+4 Subir media a Firebase Storage: desde Console o SDK; configurar reglas de Storage para pruebas.
+5 Integración Android con Jetpack Compose: dependencias Firebase, Coil, ExoPlayer, Room; cargar lista desde Firestore en ViewModel y exponer a Compose.
+6 Caché y consumo de datos: guardar metadatos en Room; descargar clips solo bajo demanda; paginación.
+7 Seguridad y producción: cambiar reglas de Firestore/Storage para exigir autenticación; usar Firebase Auth.
+
+Cronograma estimado para un prototipo funcional
+- Día 1: Crear proyecto Firebase, configurar Android Studio y subir 10 ejercicios con miniaturas y clips.
+- Día 2: Implementar listado en Compose, mostrar miniaturas con Coil.
+- Día 3: Integrar reproducción de clips con ExoPlayer y caché local.
+- Día 4: Ajustes de compresión de media, reglas de Storage y pruebas en dispositivos reales.
+
+Qué puedo entregarte ahora mismo
+- A. Generar el esqueleto de proyecto Android (ViewModel + Firestore fetch + Compose UI + Coil + ExoPlayer).
+- B. Generar un script y guía para convertir GIFs a MP4 con ffmpeg y subirlos a Firebase Storage.
+- C. Preparar ambos y un dataset de ejemplo con 10 ejercicios para importar a Firestore.
+
+Usuario: Mira te paso el enlace de GitHub del proyecto y le hechas un vistazo y me vas diciendo?
+
+Asistente: Envíame el enlace del repositorio GitHub. Pega aquí el enlace del repo y en cuanto lo tenga hago una revisión completa y te devuelvo un plan de corrección priorizado con código listo para aplicar.
+Qué revisaré en tu repo (lista priorizada): Configuración Android, Código de red y consumo de la API, Carga y reproducción de media, Problemas CORS / Hotlinking, Backend o proxy (si existe), Firebase o Storage, Assets y media incluidos, Tests y logs.
+Qué te entregaré tras revisar el repo: 1) Informe corto con problemas detectados y prioridad. 2) Parches o snippets listos para aplicar. 3) Guía paso a paso para convertir y subir media optimizada con ffmpeg. 4) Opcional: PR completo.
+Si quieres que empiece ya pega el enlace y dime si prefieres A (solo analice) o B (genere PRs).
+
+Usuario: https://github.com/tm210608/FruiterManFit/tree/feature%2Fdynamic-exercise-selection
+
+Asistente: Resumen rápido de la revisión inicial
+He revisado la rama feature/dynamic-exercise-selection de tu repo. El proyecto usa Kotlin + Jetpack Compose, Hilt, Room, Retrofit/OkHttp y Coil según el README y los ficheros del módulo app. Hay una integración en progreso con ExerciseDB y llamadas de red aún en desarrollo; eso explica por qué los GIFs no se muestran correctamente.
+
+Problemas prioritarios detectados (qué está fallando y por qué)
+1. Integración incompleta con la API de ejercicios: manejo de redirecciones, CORS ni fallback para media bloqueada.
+2. Posible falta de permisos o configuración de red en AndroidManifest / Network Security.
+3. Coil/decoder para GIFs no garantizado.
+4. No hay proxy ni almacenamiento propio para media.
+5. Falta de manejo de errores y caché.
+
+Cambios concretos y parches que te propongo (prioridad y snippets listos)
+Prioridad Alta — arreglar carga de media y evitar bloqueos
+- Añadir permiso INTERNET en AndroidManifest.xml.
+- Configurar Network Security si necesitas permitir HTTP o dominios concretos en debug.
+
+Prioridad Alta — Retrofit / OkHttp: seguir redirecciones y añadir headers
+- OkHttpClient con followRedirects(true), timeouts y User-Agent header. Ejemplo de código incluido.
+
+Prioridad Media — Proxy simple para media (evita CORS / hotlinking)
+- FastAPI proxy mínimo (descarga y reenvía el archivo). Código incluido.
+
+Prioridad Media — Convertir GIFs a MP4 (script ffmpeg)
+- Comando ffmpeg para reducir peso y generar MP4 240p.
+
+Prioridad Media — Coil + ExoPlayer en Compose (cliente)
+- Ejemplos de uso de Coil y ExoPlayer en Compose incluidos.
+
+Prioridad Baja — Caché y UX
+- Cache de metadatos con Room, descarga condicional y fallback.
+
+Plan de trabajo sugerido (qué hago yo y en qué orden)
+1. Aplicar fixes rápidos: permiso INTERNET, ajustar OkHttp y Coil.
+2. Probar carga de media: si sigue fallando, montar proxy mínimo (FastAPI).
+3. Conversión media: script ffmpeg y pipeline para subir a Firebase Storage.
+4. Integración final: actualizar Firestore/Room con nuevas URLs y ajustar UI Compose.
+
+Siguientes artefactos que te entrego ahora (elige lo que quieres que genere ya)
+A. Patch/PR con cambios en app para OkHttp + Coil + manejo básico de errores.
+B. Código del proxy FastAPI listo para desplegar (incluye instrucciones para Render).
+C. Script ffmpeg y guía paso a paso para convertir y subir clips a Firebase Storage.
+He elegido A + B + C si te parece bien; los prepararé como parches listos para aplicar en tu repo.
+
+Usuario: Hay opción de guardar ésta conversación y pasárselo a mi agente de IA en Android Studio?
+
+Asistente: Te doy tres vías prácticas:
+1. Método más rápido — copiar/pegar o archivo TXT/JSON: copia la conversación y pégala en app/src/main/assets/.
+2. Método práctico para integración — subir a Firestore / Firebase Storage: sube el JSON a Firestore o Storage y el agente lo lee.
+3. Método avanzado — exportar en formato estructurado y pasar por API local o Intent: Intent ACTION_SEND, HTTP local o archivo en almacenamiento interno.
+
+Formato recomendado y buenas prácticas para que el agente lo entienda
+- Estructura clara: conversation_id, created_at, messages[] con role, text, timestamp, meta opcional.
+- Normaliza roles: user, assistant, system.
+- Incluye contexto breve al inicio.
+- Evita HTML; usa texto plano o JSON.
+- No subas claves ni google-services.json con credenciales sensibles.
+
+Recomendación práctica para ti
+1. Exporta la conversación a JSON y guárdala en app/src/main/assets/conversation.json.
+2. Haz que tu agente lea ese archivo usando readConversationFromAssets.
+3. Si el agente está fuera del dispositivo, sube el JSON a Firestore.
+4. Si quieres, te genero ahora el JSON exportado de esta conversación listo para descargar y pegar en tu repo, o el snippet para que tu agente lo importe automáticamente.
+
+Usuario: No me has entendido, ésta conversación cuando te abra en mi laptop estará guardada en la aplicación de Copilot del pc?
+
+Asistente: Depende de cómo tengas configurado Copilot y de la cuenta con la que inicies sesión.
+- Sin sincronización o sesión distinta: no aparecerá automáticamente.
+- Con sesión y sincronización activas: si usas la misma cuenta y Copilot tiene activada la sincronización, la conversación suele guardarse en la nube y aparecerá en Historial/Conversations.
+- Política de retención y privacidad: algunos clientes permiten desactivar el guardado en la nube o borrar el historial; revisa las opciones de privacidad de Copilot.
+
+Cómo comprobarlo ahora mismo
+- Abre la app Copilot en el portátil y busca Historial o Conversations.
+- Verifica que estás logueado con la misma cuenta.
+- Revisa Ajustes > Privacidad / Historial para ver si la sincronización está activada.
+
+Si no aparece y quieres conservarla
+- Copia/pega la conversación en un archivo .txt o .json y guárdalo en tu proyecto.
+- Otra opción es subir el JSON a Firestore o Storage para que tu agente lo lea.
+
+Usuario: Créame un archivo txt con la conversación y luego la paso al ordenador por si acaso
+
+Asistente: (respuesta actual) He preparado este bloque de texto con toda la conversación para que lo guardes como archivo .txt. Sigue las instrucciones fuera del bloque para crear el archivo en tu equipo.

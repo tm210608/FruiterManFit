@@ -18,6 +18,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ejemplo.myapp.ui.components.*
+import androidx.compose.ui.res.stringResource
+import com.ejemplo.myapp.R
 import com.ejemplo.myapp.ui.theme.*
 import com.ejemplo.myapp.ui.viewmodels.ProfileViewModel
 
@@ -83,34 +85,50 @@ fun ProfileScreen(
                 }
                 
                 Spacer(modifier = Modifier.height(16.dp))
-                Text(text = "Hey, FruiterMan! 🍎", fontSize = 28.sp, fontWeight = FontWeight.Bold)
-                Text(text = "Level ${stats.level} ${stats.rank}", color = OnSurfaceVariant, fontSize = 16.sp)
+                Text(
+                    text = stringResource(R.string.profile_greeting, stats.userName),
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = stringResource(R.string.profile_level_rank, stats.level, stats.rank),
+                    color = OnSurfaceVariant,
+                    fontSize = 16.sp
+                )
                 
                 Spacer(modifier = Modifier.height(24.dp))
                 
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                   ProfileStat("${stats.streak}", "STREAK")
+                   ProfileStat("${stats.streak}", stringResource(R.string.profile_stat_streak))
                    RecapDivider()
-                   ProfileStat(stats.calories, "CALORIES")
+                   ProfileStat(stats.calories, stringResource(R.string.profile_stat_calories))
                    RecapDivider()
-                   ProfileStat(if(stats.totalVolume > 1000) "${String.format("%.1f", stats.totalVolume/1000)}k" else "${stats.totalVolume.toInt()}", "VOLUME")
+                   ProfileStat(
+                       if(stats.totalVolume > 1000) "${String.format("%.1f", stats.totalVolume/1000)}k" else "${stats.totalVolume.toInt()}",
+                       stringResource(R.string.profile_stat_volume)
+                   )
                    RecapDivider()
-                   ProfileStat("${stats.goalReached}%", "GOAL")
+                   ProfileStat("${stats.goalReached}%", stringResource(R.string.profile_stat_goal))
                 }
             }
         }
         
         Column(modifier = Modifier.padding(horizontal = 24.dp)) {
-            SectionHeader("Weekly Gains", "History", onActionClicked = onHistoryClick)
+            SectionHeader(
+                stringResource(R.string.dashboard_stat_weekly_label),
+                stringResource(R.string.profile_action_history),
+                onActionClicked = onHistoryClick
+            )
             // ... Rest of the UI remains focused on the state
             Card(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp),
                 colors = CardDefaults.cardColors(containerColor = Surface),
-                shape = RoundedCornerShape(32.dp)
+                shape = RoundedCornerShape(32.dp),
+                border = BorderStroke(1.dp, CardStroke)
             ) {
                 Column(modifier = Modifier.padding(24.dp)) {
                     Text(
-                        text = "You're crushing the cardio, but maybe eat more berries? 🍓",
+                        text = stringResource(R.string.profile_advice_default),
                         color = OnSurfaceVariant,
                         fontSize = 14.sp
                     )
