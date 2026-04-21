@@ -15,8 +15,15 @@ import androidx.compose.ui.unit.sp
 import com.ejemplo.myapp.ui.components.*
 import com.ejemplo.myapp.ui.theme.*
 
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.ejemplo.myapp.ui.viewmodels.UserViewModel
+
 @Composable
-fun SignupScreen(onSignupSuccess: () -> Unit, onBack: () -> Unit) {
+fun SignupScreen(
+    onSignupSuccess: () -> Unit,
+    onBack: () -> Unit,
+    viewModel: UserViewModel = hiltViewModel()
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -47,17 +54,25 @@ fun SignupScreen(onSignupSuccess: () -> Unit, onBack: () -> Unit) {
                 
                 Spacer(modifier = Modifier.height(32.dp))
                 
-                AppTextField(label = "FULL NAME", placeholder = "John Appleseed")
+                var name by remember { mutableStateOf("") }
+                var email by remember { mutableStateOf("") }
+                var password by remember { mutableStateOf("") }
+
+                AppTextField(label = "FULL NAME", placeholder = "John Appleseed", value = name, onValueChange = { name = it })
                 Spacer(modifier = Modifier.height(16.dp))
-                AppTextField(label = "EMAIL", placeholder = "fruity@man.com")
+                AppTextField(label = "EMAIL", placeholder = "fruity@man.com", value = email, onValueChange = { email = it })
                 Spacer(modifier = Modifier.height(16.dp))
-                AppTextField(label = "PASSWORD", placeholder = "••••••••", isPassword = true)
+                AppTextField(label = "PASSWORD", placeholder = "••••••••", value = password, onValueChange = { password = it }, isPassword = true)
                 
                 Spacer(modifier = Modifier.height(32.dp))
                 
                 AppButton(
                     text = "PLANT MY SEED", 
-                    onClick = onSignupSuccess,
+                    onClick = {
+                        viewModel.register(name, email, password) { success ->
+                            if (success) onSignupSuccess()
+                        }
+                    },
                     containerColor = BrightPink
                 )
                 
