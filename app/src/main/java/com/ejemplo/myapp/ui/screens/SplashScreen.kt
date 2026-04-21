@@ -13,11 +13,24 @@ import androidx.compose.ui.unit.sp
 import com.ejemplo.myapp.ui.theme.*
 import kotlinx.coroutines.delay
 
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.ejemplo.myapp.ui.viewmodels.UserViewModel
+import kotlinx.coroutines.delay
+
 @Composable
-fun SplashScreen(onTimeout: () -> Unit) {
+fun SplashScreen(
+    onNavigateToDashboard: () -> Unit,
+    onNavigateToLogin: () -> Unit,
+    viewModel: UserViewModel = hiltViewModel()
+) {
     LaunchedEffect(Unit) {
         delay(2000)
-        onTimeout()
+        val user = viewModel.checkExistingSession()
+        if (user != null) {
+            onNavigateToDashboard()
+        } else {
+            onNavigateToLogin()
+        }
     }
 
     Box(

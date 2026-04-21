@@ -50,3 +50,27 @@ data class ExerciseSetEntity(
     val reps: Int,
     val isDone: Boolean
 )
+
+@Entity(tableName = "users")
+data class UserEntity(
+    @PrimaryKey val id: Int = 1,
+    val name: String,
+    val email: String,
+    val password: String,
+    val rank: String,
+    val weeklyGoal: Int = 5,
+    val avatarUrl: String? = null
+)
+
+@Entity(tableName = "fruit_challenges")
+data class FruitChallengeEntity(
+    @PrimaryKey val id: String,
+    val title: String,
+    val description: String,
+    val iconType: String, // e.g., "APPLE", "BANANA", "CHERRY"
+    val progress: Float,
+    val target: Float,
+    val isCompleted: Boolean = false,
+    val isClaimed: Boolean = false,
+    val category: String // e.g., "DAILY", "WEEKLY"
+)

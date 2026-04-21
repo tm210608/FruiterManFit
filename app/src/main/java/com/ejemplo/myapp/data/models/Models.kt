@@ -26,6 +26,7 @@ data class Exercise(
 )
 
 data class UserStats(
+    val userName: String = "Fresh Fruit",
     val level: Int,
     val rank: String,
     val streak: Int,
@@ -51,4 +52,14 @@ data class ActiveExercise(
     val accentColor: Color,
     val sets: List<SessionSet>,
     val gifUrl: String = ""
+)
+
+data class FruitChallenge(
+    val id: String,
+    val title: String,
+    val description: String,
+    val icon: Any, // ImageVector or Resource ID
+    val progress: Float,
+    val isCompleted: Boolean = false,
+    val isClaimed: Boolean = false
 )

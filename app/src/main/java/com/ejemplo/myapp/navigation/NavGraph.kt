@@ -24,11 +24,18 @@ fun SetupNavGraph(
         startDestination = Screen.Splash.route
     ) {
         composable(Screen.Splash.route) {
-            SplashScreen {
-                navController.navigate(Screen.Login.route) {
-                    popUpTo(Screen.Splash.route) { inclusive = true }
+            SplashScreen(
+                onNavigateToDashboard = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Splash.route) { inclusive = true }
+                    }
+                },
+                onNavigateToLogin = {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(Screen.Splash.route) { inclusive = true }
+                    }
                 }
-            }
+            )
         }
         composable(Screen.Login.route) {
             LoginScreen(
@@ -53,6 +60,7 @@ fun SetupNavGraph(
         composable(Screen.Home.route) {
             val viewModel: DashboardViewModel = hiltViewModel()
             DashboardScreen(
+                navController = navController,
                 viewModel = viewModel,
                 onLaunchWorkout = { navController.navigate(Screen.Session.route) },
                 onSeeAllPlans = { navController.navigate(Screen.Plans.route) }
@@ -145,6 +153,9 @@ fun SetupNavGraph(
                 repository = detailViewModel.repository,
                 onBack = { navController.popBackStack() }
             )
+        }
+        composable(Screen.Nutrition.route) {
+            NutritionLogScreen(onBack = { navController.popBackStack() })
         }
     }
 }

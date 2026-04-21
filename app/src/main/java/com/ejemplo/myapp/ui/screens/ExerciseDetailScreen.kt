@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material3.*
@@ -28,7 +29,10 @@ import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
 import com.ejemplo.myapp.data.models.Exercise
 import com.ejemplo.myapp.data.repository.FitnessRepository
+import androidx.compose.ui.res.stringResource
+import com.ejemplo.myapp.R
 import com.ejemplo.myapp.ui.theme.*
+import com.ejemplo.myapp.ui.utils.translateCategory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,7 +64,7 @@ fun ExerciseDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Exercise Details", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.detail_title), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -121,14 +125,14 @@ fun ExerciseDetailScreen(
                                 )
                                 Spacer(modifier = Modifier.height(16.dp))
                                 Text(
-                                    ex.bodyPart.uppercase(),
+                                    translateCategory(ex.bodyPart).uppercase(),
                                     color = (ex.accentColor ?: BrightLime),
                                     fontWeight = FontWeight.Black,
                                     fontSize = 24.sp,
                                     letterSpacing = 2.sp
                                 )
                                 Text(
-                                    "No Preview Available",
+                                    stringResource(R.string.detail_no_preview),
                                     color = OnSurfaceVariant.copy(alpha = 0.4f),
                                     fontWeight = FontWeight.Medium,
                                     fontSize = 12.sp
@@ -174,7 +178,7 @@ fun ExerciseDetailScreen(
                         shape = RoundedCornerShape(8.dp)
                     ) {
                         Text(
-                            text = ex.bodyPart.uppercase(),
+                            text = translateCategory(ex.bodyPart).uppercase(),
                             modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
@@ -211,7 +215,7 @@ fun ExerciseDetailScreen(
                 }
                 
                 Text(
-                    text = "Target: ${ex.target.uppercase()}",
+                    text = stringResource(R.string.detail_target, ex.target.uppercase()),
                     color = BrightLime,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
@@ -222,7 +226,7 @@ fun ExerciseDetailScreen(
 
                 // Instructions
                 Text(
-                    text = "INSTRUCTIONS",
+                    text = stringResource(R.string.detail_instructions_title),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Black,
                     color = BrightLime
@@ -260,6 +264,11 @@ fun ExerciseDetailScreen(
             }
         } ?: Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator(color = BrightLime)
+            Text(
+                text = stringResource(R.string.detail_loading),
+                modifier = Modifier.padding(top = 80.dp),
+                color = OnSurfaceVariant
+            )
         }
     }
 
@@ -279,13 +288,12 @@ fun ExerciseDetailScreen(
                 shape = RoundedCornerShape(16.dp),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp)
             ) {
-                Icon(Icons.Default.FitnessCenter, contentDescription = null, tint = Background)
+                Icon(Icons.Default.PlayArrow, contentDescription = null, tint = Background)
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(
-                    text = "START THIS EXERCISE",
+                    text = stringResource(R.string.detail_action_start),
                     color = Background,
-                    fontWeight = FontWeight.Black,
-                    letterSpacing = 1.sp
+                    fontWeight = FontWeight.Black
                 )
             }
         }

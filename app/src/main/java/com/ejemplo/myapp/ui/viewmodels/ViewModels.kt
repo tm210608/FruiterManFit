@@ -21,8 +21,21 @@ class DashboardViewModel @Inject constructor(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = UserStats(1, "Fresh Fruit", 0, "0", 0)
+            initialValue = UserStats(userName = "Fresh Fruit", level = 1, rank = "Fresh Fruit", streak = 0, calories = "0", goalReached = 0)
         )
+
+    val challenges: StateFlow<List<FruitChallenge>> = repository.getFruitChallenges()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+    fun claimChallenge(id: String) {
+        viewModelScope.launch {
+            repository.claimChallenge(id)
+        }
+    }
 }
 
 @HiltViewModel
@@ -33,7 +46,7 @@ class ProfileViewModel @Inject constructor(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = UserStats(1, "Fresh Fruit", 0, "0", 0)
+            initialValue = UserStats(userName = "Fresh Fruit", level = 1, rank = "Fresh Fruit", streak = 0, calories = "0", goalReached = 0)
         )
 }
 
@@ -119,7 +132,7 @@ class WorkoutSessionViewModel @Inject constructor(
                     sets = listOf(SessionSet(1, "0", "0", false)),
                     gifUrl = it.gifUrl
                 )
-                _activeExercises.value = _activeExercises.value + newActiveExercise
+                _activeExercises.value += newActiveExercise
             }
         }
     }

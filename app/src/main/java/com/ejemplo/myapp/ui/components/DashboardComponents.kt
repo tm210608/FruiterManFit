@@ -1,22 +1,47 @@
 package com.ejemplo.myapp.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ejemplo.myapp.R
+import com.ejemplo.myapp.data.models.FruitChallenge
 import com.ejemplo.myapp.ui.theme.*
+
+import androidx.compose.ui.tooling.preview.Preview
+import com.ejemplo.myapp.ui.theme.FruiterManTheme
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewStatCard() {
+    FruiterManTheme {
+        StatCard(
+            label = "Weekly",
+            value = "5/5",
+            bottomText = "Workouts",
+            containerColor = Surface,
+            valueColor = BrightBlue,
+            icon = Icons.Default.FlashOn
+        )
+    }
+}
 
 @Composable
 fun StatCard(
@@ -32,7 +57,9 @@ fun StatCard(
     Card(
         modifier = modifier.height(140.dp),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = containerColor)
+        colors = CardDefaults.cardColors(containerColor = containerColor),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.05f))
     ) {
         Column(
             modifier = Modifier
@@ -46,109 +73,37 @@ fun StatCard(
                 verticalAlignment = Alignment.Top
             ) {
                 Text(
-                    text = label.uppercase(),
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Black,
-                    color = if (containerColor == BrightLime) Background.copy(alpha = 0.6f) else OnSurfaceVariant,
-                    letterSpacing = 1.sp
+                    text = label,
+                    color = if (containerColor == BrightLime) Background.copy(alpha = 0.7f) else OnSurfaceVariant,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 0.5.sp
                 )
                 icon?.let {
-                    Icon(imageVector = it, contentDescription = null, tint = iconColor, modifier = Modifier.size(16.dp))
+                    Icon(
+                        imageVector = it,
+                        contentDescription = null,
+                        tint = iconColor,
+                        modifier = Modifier.size(18.dp)
+                    )
                 }
             }
             
             Column {
                 Text(
                     text = value,
-                    fontSize = 28.sp,
+                    color = valueColor,
+                    fontSize = 32.sp,
                     fontWeight = FontWeight.Black,
-                    color = valueColor
+                    lineHeight = 32.sp
                 )
                 bottomText?.let {
                     Text(
                         text = it,
-                        fontSize = 10.sp,
-                        color = if (containerColor == BrightLime) Background.copy(alpha = 0.6f) else OnSurfaceVariant,
-                        fontWeight = FontWeight.Bold
+                        color = if (containerColor == BrightLime) Background.copy(alpha = 0.7f) else OnSurfaceVariant,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Medium
                     )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun VolumeChart(
-    weeklyVolume: List<Double>,
-    modifier: Modifier = Modifier
-) {
-    val maxVolume = weeklyVolume.maxOrNull()?.coerceAtLeast(1.0) ?: 1.0
-    val days = listOf("L", "M", "X", "J", "V", "S", "D")
-
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(200.dp),
-        shape = RoundedCornerShape(32.dp),
-        colors = CardDefaults.cardColors(containerColor = Surface)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(20.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    "VOLUMEN SEMANAL",
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Black,
-                    color = OnSurfaceVariant,
-                    letterSpacing = 1.sp
-                )
-                Text(
-                    "${weeklyVolume.sum().toInt()} KG",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Black,
-                    color = BrightLime
-                )
-            }
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.Bottom
-            ) {
-                weeklyVolume.forEachIndexed { index, volume ->
-                    val barHeight = (volume / maxVolume * 80).dp.coerceAtLeast(4.dp)
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Bottom
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .width(12.dp)
-                                .height(barHeight)
-                                .clip(RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp))
-                                .background(
-                                    if (index == weeklyVolume.size - 1) BrightLime else BrightBlue.copy(alpha = 0.6f)
-                                )
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = days[index],
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = OnSurfaceVariant
-                        )
-                    }
                 }
             }
         }
@@ -165,52 +120,91 @@ fun FeaturedWorkoutCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(200.dp)
+            .height(220.dp)
             .clickable { onLaunch() },
         shape = RoundedCornerShape(32.dp),
-        colors = CardDefaults.cardColors(containerColor = Surface)
+        colors = CardDefaults.cardColors(containerColor = Surface),
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.1f))
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            // Simple decorative element
+            // High contrast decorative element
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .size(150.dp)
-                    .offset(x = 40.dp, y = 40.dp)
-                    .clip(RoundedCornerShape(75.dp))
-                    .background(BrightBlue.copy(alpha = 0.1f))
+                    .size(180.dp)
+                    .offset(x = 50.dp, y = 50.dp)
+                    .clip(RoundedCornerShape(90.dp))
+                    .background(
+                        Brush.radialGradient(
+                            colors = listOf(BrightBlue.copy(alpha = 0.3f), Color.Transparent)
+                        )
+                    )
             )
             
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(24.dp),
+                    .padding(28.dp),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Tag(text = level, containerColor = BrightBlue.copy(alpha = 0.1f), contentColor = BrightBlue)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Tag(text = duration)
+                    InternalTag(
+                        text = level.uppercase(),
+                        containerColor = BrightBlue.copy(alpha = 0.15f),
+                        contentColor = BrightBlue
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            Icons.Default.Timer,
+                            contentDescription = null,
+                            tint = OnSurfaceVariant,
+                            modifier = Modifier.size(14.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = duration,
+                            color = OnSurfaceVariant,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
                 
                 Column {
                     Text(
                         text = title,
-                        fontSize = 24.sp,
+                        fontSize = 28.sp,
                         fontWeight = FontWeight.Black,
-                        color = OnSurface
+                        color = OnSurface,
+                        lineHeight = 32.sp
                     )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Row(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(BrightLime)
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Surface(
+                        onClick = onLaunch,
+                        shape = RoundedCornerShape(16.dp),
+                        color = BrightLime,
+                        modifier = Modifier.height(48.dp)
                     ) {
-                        Icon(Icons.Default.PlayArrow, contentDescription = null, tint = Background, modifier = Modifier.size(16.dp))
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("START NOW", color = Background, fontWeight = FontWeight.Black, fontSize = 12.sp)
+                        Row(
+                            modifier = Modifier.padding(horizontal = 24.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                Icons.Default.PlayArrow,
+                                contentDescription = null,
+                                tint = Background,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = stringResource(R.string.dashboard_action_start_now),
+                                color = Background,
+                                fontWeight = FontWeight.Black,
+                                fontSize = 14.sp,
+                                letterSpacing = 0.5.sp
+                            )
+                        }
                     }
                 }
             }
@@ -219,12 +213,70 @@ fun FeaturedWorkoutCard(
 }
 
 @Composable
-fun ActivityItem(title: String, time: String, icon: ImageVector, color: Color) {
+fun VolumeChart(weeklyVolume: List<Double>) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp),
+        shape = RoundedCornerShape(32.dp),
+        colors = CardDefaults.cardColors(containerColor = Surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(modifier = Modifier.padding(24.dp)) {
+            Text(
+                text = stringResource(R.string.dashboard_chart_volume_title),
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Black,
+                letterSpacing = 1.sp,
+                color = OnSurfaceVariant
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            Row(
+                modifier = Modifier.fillMaxSize(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                val maxVolume = (weeklyVolume.maxOrNull() ?: 1.0).coerceAtLeast(1.0)
+                weeklyVolume.forEach { volume ->
+                    val heightFactor = (volume / maxVolume).toFloat().coerceIn(0.1f, 1f)
+                    Box(
+                        modifier = Modifier
+                            .width(32.dp)
+                            .fillMaxHeight(heightFactor)
+                            .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
+                            .background(
+                                Brush.verticalGradient(
+                                    listOf(BrightBlue, BrightBlue.copy(alpha = 0.3f))
+                                )
+                            )
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun InternalTag(text: String, containerColor: Color = Surface, contentColor: Color = OnSurfaceVariant) {
+    Surface(
+        color = containerColor,
+        shape = RoundedCornerShape(8.dp),
+        modifier = Modifier.height(24.dp)
+    ) {
+        Box(modifier = Modifier.padding(horizontal = 8.dp), contentAlignment = Alignment.Center) {
+            Text(text = text, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = contentColor)
+        }
+    }
+}
+
+@Composable
+fun ActivityItem(title: String, time: String, icon: ImageVector, color: Color, onClick: () -> Unit = {}) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))
             .background(Surface)
+            .clickable { onClick() }
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -241,6 +293,104 @@ fun ActivityItem(title: String, time: String, icon: ImageVector, color: Color) {
         Column {
             Text(text = title, fontWeight = FontWeight.Bold, fontSize = 15.sp)
             Text(text = time, color = OnSurfaceVariant, fontSize = 12.sp)
+        }
+    }
+}
+
+@Composable
+fun ChallengesSection(challenges: List<FruitChallenge>, onClaim: (String) -> Unit = {}) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        challenges.forEach { challenge ->
+            ChallengeItem(challenge, onClaim)
+            Spacer(modifier = Modifier.height(12.dp))
+        }
+    }
+}
+
+@Composable
+fun ChallengeItem(challenge: FruitChallenge, onClaim: (String) -> Unit = {}) {
+    val icon = when(challenge.icon.toString()) {
+        "APPLE" -> Icons.Default.Star 
+        "BANANA" -> Icons.Default.FlashOn
+        else -> Icons.Default.FitnessCenter
+    }
+    
+    val color = if (challenge.isCompleted) BrightLime else BrightBlue
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(24.dp))
+            .background(Surface)
+            .border(
+                BorderStroke(1.dp, if (challenge.isCompleted && !challenge.isClaimed) BrightLime.copy(alpha = 0.5f) else Color.Transparent),
+                RoundedCornerShape(24.dp)
+            )
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape)
+                .background(if (challenge.isClaimed) OnSurfaceVariant.copy(alpha = 0.1f) else color.copy(alpha = 0.1f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon, 
+                contentDescription = null, 
+                tint = if (challenge.isClaimed) OnSurfaceVariant else color, 
+                modifier = Modifier.size(24.dp)
+            )
+        }
+        
+        Spacer(modifier = Modifier.width(16.dp))
+        
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = challenge.title, 
+                fontWeight = FontWeight.Black, 
+                fontSize = 16.sp,
+                color = if (challenge.isClaimed) OnSurfaceVariant else if (challenge.isCompleted) BrightLime else OnSurface
+            )
+            Text(
+                text = challenge.description, 
+                color = OnSurfaceVariant, 
+                fontSize = 12.sp
+            )
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            LinearProgressIndicator(
+                progress = challenge.progress,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(6.dp)
+                    .clip(CircleShape),
+                color = if (challenge.isClaimed) OnSurfaceVariant else color,
+                trackColor = color.copy(alpha = 0.1f)
+            )
+        }
+        
+        if (challenge.isCompleted && !challenge.isClaimed) {
+            Spacer(modifier = Modifier.width(12.dp))
+            Button(
+                onClick = { onClaim(challenge.id) },
+                colors = ButtonDefaults.buttonColors(containerColor = BrightLime),
+                contentPadding = PaddingValues(horizontal = 12.dp),
+                modifier = Modifier.height(32.dp),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text(stringResource(R.string.challenge_reward_claim), fontSize = 10.sp, fontWeight = FontWeight.Black, color = Background)
+            }
+        } else if (challenge.isClaimed) {
+            Spacer(modifier = Modifier.width(12.dp))
+            Icon(
+                Icons.Default.CheckCircle, 
+                contentDescription = null, 
+                tint = OnSurfaceVariant,
+                modifier = Modifier.size(24.dp)
+            )
         }
     }
 }

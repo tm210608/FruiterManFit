@@ -3,6 +3,7 @@ package com.ejemplo.myapp.di
 import com.ejemplo.myapp.data.local.dao.FitnessDao
 import com.ejemplo.myapp.data.remote.ExerciseApiService
 import com.ejemplo.myapp.data.repository.FitnessRepository
+import com.ejemplo.myapp.data.repository.UserRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,5 +21,13 @@ object RepositoryModule {
         exerciseApiService: ExerciseApiService
     ): FitnessRepository {
         return FitnessRepository(fitnessDao, exerciseApiService)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserRepository(
+        fitnessDao: FitnessDao
+    ): UserRepository {
+        return UserRepository(fitnessDao)
     }
 }

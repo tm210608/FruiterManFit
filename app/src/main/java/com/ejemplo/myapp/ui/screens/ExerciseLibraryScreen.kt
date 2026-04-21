@@ -21,7 +21,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
+import androidx.compose.ui.res.stringResource
+import com.ejemplo.myapp.R
 import com.ejemplo.myapp.ui.theme.*
+import com.ejemplo.myapp.ui.utils.translateCategory
 import com.ejemplo.myapp.ui.viewmodels.ExerciseLibraryViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -95,7 +98,7 @@ fun ExerciseLibraryScreen(
                 
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(selectedExercise!!.name.uppercase(), fontWeight = FontWeight.Black, fontSize = 20.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
-                Text(selectedExercise!!.bodyPart.uppercase(), color = BrightLime, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                Text(translateCategory(selectedExercise!!.bodyPart).uppercase(), color = BrightLime, fontWeight = FontWeight.Bold, fontSize = 12.sp)
                 
                 Spacer(modifier = Modifier.height(32.dp))
                 
@@ -111,7 +114,7 @@ fun ExerciseLibraryScreen(
                 ) {
                     Icon(Icons.Default.Info, contentDescription = null, tint = BrightBlue)
                     Spacer(modifier = Modifier.width(12.dp))
-                    Text("VER INSTRUCCIONES", color = OnSurface, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.library_action_view_instructions), color = OnSurface, fontWeight = FontWeight.Bold)
                 }
                 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -127,7 +130,7 @@ fun ExerciseLibraryScreen(
                 ) {
                     Icon(Icons.Default.Add, contentDescription = null, tint = Background)
                     Spacer(modifier = Modifier.width(12.dp))
-                    Text("AÑADIR AL ENTRENAMIENTO", color = Background, fontWeight = FontWeight.Black)
+                    Text(stringResource(R.string.library_action_add_to_workout), color = Background, fontWeight = FontWeight.Black)
                 }
             }
         }
@@ -148,13 +151,13 @@ fun ExerciseLibraryScreen(
         ) {
             Column {
                 Text(
-                    text = "EXPLORA LA\nBIBLIOTECA",
+                    text = stringResource(R.string.library_title),
                     fontSize = 36.sp,
                     fontWeight = FontWeight.Black,
                     lineHeight = 34.sp
                 )
                 Text(
-                    text = "${exercises.size} Ejercicios Cargados",
+                    text = stringResource(R.string.library_subtitle, exercises.size),
                     color = BrightLime,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold
@@ -212,7 +215,18 @@ fun ExerciseLibraryScreen(
         
         Spacer(modifier = Modifier.height(24.dp))
         
-        val filters = listOf("Todo", "waist", "chest", "back", "cardio", "upper arms", "lower arms", "upper legs", "lower legs", "shoulders")
+        val filters = listOf(
+            stringResource(R.string.library_filter_all),
+            stringResource(R.string.category_waist),
+            stringResource(R.string.category_chest),
+            stringResource(R.string.category_back),
+            stringResource(R.string.category_cardio),
+            stringResource(R.string.category_upper_arms),
+            stringResource(R.string.category_lower_arms),
+            stringResource(R.string.category_upper_legs),
+            stringResource(R.string.category_lower_legs),
+            stringResource(R.string.category_shoulders)
+        )
         LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             items(filters) { filter ->
                 val isSelected = filter == selectedFilter
@@ -295,7 +309,7 @@ fun ExercisePlaceholder(category: String, equipment: String, color: Color) {
             modifier = Modifier.size(64.dp)
         )
         Text(
-            category.uppercase(),
+            translateCategory(category).uppercase(),
             color = color.copy(alpha = 0.4f),
             fontWeight = FontWeight.Black,
             fontSize = 14.sp
@@ -381,7 +395,7 @@ fun SmallExerciseCard(
                     color = OnSurface
                 )
                 Text(
-                    text = category.uppercase(), 
+                    text = translateCategory(category).uppercase(),
                     color = color, 
                     fontSize = 9.sp,
                     fontWeight = FontWeight.Black,

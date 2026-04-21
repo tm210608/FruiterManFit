@@ -46,6 +46,29 @@ interface FitnessDao {
 
     @Delete
     suspend fun deleteSet(set: ExerciseSetEntity)
+
+    // User Profile
+    @Query("SELECT * FROM users WHERE id = 1")
+    fun getUser(): Flow<UserEntity?>
+
+    @Query("SELECT * FROM users WHERE email = :email LIMIT 1")
+    suspend fun getUserByEmail(email: String): UserEntity?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertUser(user: UserEntity)
+
+    // Fruit Challenges
+    @Query("SELECT * FROM fruit_challenges")
+    fun getAllChallenges(): Flow<List<FruitChallengeEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertChallenges(challenges: List<FruitChallengeEntity>)
+
+    @Query("UPDATE fruit_challenges SET progress = :progress, isCompleted = :isCompleted WHERE id = :id")
+    suspend fun updateChallengeProgress(id: String, progress: Float, isCompleted: Boolean)
+
+    @Query("UPDATE fruit_challenges SET isClaimed = 1 WHERE id = :id")
+    suspend fun claimChallenge(id: String)
 }
 
 data class SessionExerciseWithSets(

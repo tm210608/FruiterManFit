@@ -13,14 +13,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.ejemplo.myapp.R
 import com.ejemplo.myapp.ui.components.*
 import com.ejemplo.myapp.ui.theme.*
+import com.ejemplo.myapp.ui.viewmodels.DashboardViewModel
 
 @Composable
-fun SettingsScreen(onBack: () -> Unit, onLogout: () -> Unit) {
+fun SettingsScreen(
+    onBack: () -> Unit,
+    onLogout: () -> Unit,
+    viewModel: DashboardViewModel = hiltViewModel()
+) {
+    val stats by viewModel.stats.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -43,7 +53,7 @@ fun SettingsScreen(onBack: () -> Unit, onLogout: () -> Unit) {
                 Icon(Icons.Default.ArrowBack, contentDescription = null, tint = BrightLime, modifier = Modifier.size(20.dp))
             }
             Text(
-                text = "Settings",
+                text = stringResource(R.string.settings_title),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Black,
                 modifier = Modifier.weight(1f).padding(start = 16.dp)
@@ -72,7 +82,7 @@ fun SettingsScreen(onBack: () -> Unit, onLogout: () -> Unit) {
                     ) {
                         Surface(modifier = Modifier.fillMaxSize(), shape = CircleShape, color = Color.Gray.copy(alpha = 0.3f)) {
                             Box(contentAlignment = Alignment.Center) {
-                                Text("FM", fontSize = 24.sp, fontWeight = FontWeight.Black)
+                                Text(stringResource(R.string.settings_avatar_placeholder), fontSize = 24.sp, fontWeight = FontWeight.Black)
                             }
                         }
                     }
@@ -85,25 +95,25 @@ fun SettingsScreen(onBack: () -> Unit, onLogout: () -> Unit) {
                 }
                 
                 Spacer(modifier = Modifier.height(16.dp))
-                Text(text = "Fruit Master John", fontWeight = FontWeight.Black, fontSize = 20.sp)
-                Text(text = "Member since May 2024", color = OnSurfaceVariant, fontSize = 12.sp)
+                Text(text = stats.userName, fontWeight = FontWeight.Black, fontSize = 20.sp)
+                Text(text = stringResource(R.string.settings_member_since), color = OnSurfaceVariant, fontSize = 12.sp)
                 
                 Spacer(modifier = Modifier.height(32.dp))
                 
-                SettingsField("Full Name", "John Appleseed")
+                SettingsField(stringResource(R.string.settings_label_fullname), stats.userName)
                 Spacer(modifier = Modifier.height(16.dp))
-                SettingsField("Bio", "Fueling my workouts with nature's candy! 🍎🍓", isTextArea = true)
+                SettingsField(stringResource(R.string.settings_label_bio), stringResource(R.string.settings_bio_default), isTextArea = true)
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    SettingsField("Weight (kg)", "78", modifier = Modifier.weight(1f))
-                    SettingsField("Height (cm)", "182", modifier = Modifier.weight(1f))
+                    SettingsField(stringResource(R.string.settings_label_weight), "78", modifier = Modifier.weight(1f))
+                    SettingsField(stringResource(R.string.settings_label_height), "182", modifier = Modifier.weight(1f))
                 }
                 
                 Spacer(modifier = Modifier.height(32.dp))
                 
                 Divider(color = Color.White.copy(alpha = 0.05f))
-                SettingsToggle("Notifications", Icons.Default.Notifications, true)
-                SettingsToggle("Dark Mode", Icons.Default.DarkMode, true)
+                SettingsToggle(stringResource(R.string.settings_label_notifications), Icons.Default.Notifications, true)
+                SettingsToggle(stringResource(R.string.settings_label_dark_mode), Icons.Default.DarkMode, true)
                 
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
@@ -113,7 +123,7 @@ fun SettingsScreen(onBack: () -> Unit, onLogout: () -> Unit) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.SettingsAccessibility, contentDescription = null, tint = BrightLime, modifier = Modifier.size(20.dp))
                         Spacer(modifier = Modifier.width(12.dp))
-                        Text("Unit System", fontWeight = FontWeight.Black, fontSize = 14.sp)
+                        Text(stringResource(R.string.settings_label_unit_system), fontWeight = FontWeight.Black, fontSize = 14.sp)
                     }
                     Surface(
                         color = Color.White.copy(alpha = 0.05f),
@@ -121,7 +131,7 @@ fun SettingsScreen(onBack: () -> Unit, onLogout: () -> Unit) {
                     ) {
                         Row(modifier = Modifier.padding(2.dp)) {
                             Text(
-                                text = "Metric",
+                                text = stringResource(R.string.settings_unit_metric),
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(10.dp))
                                     .background(BrightLime)
@@ -131,7 +141,7 @@ fun SettingsScreen(onBack: () -> Unit, onLogout: () -> Unit) {
                                 fontSize = 11.sp
                             )
                             Text(
-                                text = "Imperial",
+                                text = stringResource(R.string.settings_unit_imperial),
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                                 color = OnSurfaceVariant,
                                 fontWeight = FontWeight.Black,
@@ -145,12 +155,12 @@ fun SettingsScreen(onBack: () -> Unit, onLogout: () -> Unit) {
         
         Spacer(modifier = Modifier.height(24.dp))
         
-        AppButton("Save Changes", {}, containerColor = BrightLime)
+        AppButton(stringResource(R.string.settings_action_save), {}, containerColor = BrightLime)
         
         Spacer(modifier = Modifier.height(16.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            SecondarySettingsButton("Help", Icons.Default.Help, modifier = Modifier.weight(1f))
-            SecondarySettingsButton("Terms", Icons.Default.Gavel, modifier = Modifier.weight(1f))
+            SecondarySettingsButton(stringResource(R.string.settings_action_help), Icons.Default.Help, modifier = Modifier.weight(1f))
+            SecondarySettingsButton(stringResource(R.string.settings_action_terms), Icons.Default.Gavel, modifier = Modifier.weight(1f))
         }
         
         Spacer(modifier = Modifier.height(16.dp))
@@ -162,7 +172,7 @@ fun SettingsScreen(onBack: () -> Unit, onLogout: () -> Unit) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.Logout, contentDescription = null, modifier = Modifier.size(20.dp))
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Log Out", fontWeight = FontWeight.Black)
+                Text(stringResource(R.string.settings_action_logout), fontWeight = FontWeight.Black)
             }
         }
         
