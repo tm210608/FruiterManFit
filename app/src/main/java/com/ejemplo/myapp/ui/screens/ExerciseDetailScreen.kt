@@ -32,6 +32,7 @@ import com.ejemplo.myapp.data.repository.FitnessRepository
 import androidx.compose.ui.res.stringResource
 import com.ejemplo.myapp.R
 import com.ejemplo.myapp.ui.theme.*
+import com.ejemplo.myapp.ui.utils.translateCategory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,7 +64,7 @@ fun ExerciseDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Exercise Details", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.detail_title), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -124,14 +125,14 @@ fun ExerciseDetailScreen(
                                 )
                                 Spacer(modifier = Modifier.height(16.dp))
                                 Text(
-                                    ex.bodyPart.uppercase(),
+                                    translateCategory(ex.bodyPart).uppercase(),
                                     color = (ex.accentColor ?: BrightLime),
                                     fontWeight = FontWeight.Black,
                                     fontSize = 24.sp,
                                     letterSpacing = 2.sp
                                 )
                                 Text(
-                                    "No Preview Available",
+                                    stringResource(R.string.detail_no_preview),
                                     color = OnSurfaceVariant.copy(alpha = 0.4f),
                                     fontWeight = FontWeight.Medium,
                                     fontSize = 12.sp
@@ -177,7 +178,7 @@ fun ExerciseDetailScreen(
                         shape = RoundedCornerShape(8.dp)
                     ) {
                         Text(
-                            text = ex.bodyPart.uppercase(),
+                            text = translateCategory(ex.bodyPart).uppercase(),
                             modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,

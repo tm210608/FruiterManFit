@@ -24,6 +24,7 @@ import coil.request.ImageRequest
 import androidx.compose.ui.res.stringResource
 import com.ejemplo.myapp.R
 import com.ejemplo.myapp.ui.theme.*
+import com.ejemplo.myapp.ui.utils.translateCategory
 import com.ejemplo.myapp.ui.viewmodels.ExerciseLibraryViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -97,7 +98,7 @@ fun ExerciseLibraryScreen(
                 
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(selectedExercise!!.name.uppercase(), fontWeight = FontWeight.Black, fontSize = 20.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
-                Text(selectedExercise!!.bodyPart.uppercase(), color = BrightLime, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                Text(translateCategory(selectedExercise!!.bodyPart).uppercase(), color = BrightLime, fontWeight = FontWeight.Bold, fontSize = 12.sp)
                 
                 Spacer(modifier = Modifier.height(32.dp))
                 
@@ -222,7 +223,9 @@ fun ExerciseLibraryScreen(
             stringResource(R.string.category_cardio),
             stringResource(R.string.category_upper_arms),
             stringResource(R.string.category_lower_arms),
-            "upper legs", "lower legs", "shoulders"
+            stringResource(R.string.category_upper_legs),
+            stringResource(R.string.category_lower_legs),
+            stringResource(R.string.category_shoulders)
         )
         LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             items(filters) { filter ->
@@ -306,7 +309,7 @@ fun ExercisePlaceholder(category: String, equipment: String, color: Color) {
             modifier = Modifier.size(64.dp)
         )
         Text(
-            category.uppercase(),
+            translateCategory(category).uppercase(),
             color = color.copy(alpha = 0.4f),
             fontWeight = FontWeight.Black,
             fontSize = 14.sp
@@ -392,7 +395,7 @@ fun SmallExerciseCard(
                     color = OnSurface
                 )
                 Text(
-                    text = category.uppercase(), 
+                    text = translateCategory(category).uppercase(),
                     color = color, 
                     fontSize = 9.sp,
                     fontWeight = FontWeight.Black,

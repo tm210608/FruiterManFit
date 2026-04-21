@@ -60,5 +60,6 @@ data class FruitChallenge(
     val description: String,
     val icon: Any, // ImageVector or Resource ID
     val progress: Float,
-    val isCompleted: Boolean = false
+    val isCompleted: Boolean = false,
+    val isClaimed: Boolean = false
 )

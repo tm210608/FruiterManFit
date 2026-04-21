@@ -30,6 +30,12 @@ class DashboardViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
+
+    fun claimChallenge(id: String) {
+        viewModelScope.launch {
+            repository.claimChallenge(id)
+        }
+    }
 }
 
 @HiltViewModel

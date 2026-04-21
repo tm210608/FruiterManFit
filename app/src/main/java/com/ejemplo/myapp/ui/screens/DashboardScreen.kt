@@ -11,12 +11,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ejemplo.myapp.R
+import com.ejemplo.myapp.navigation.Screen
 import com.ejemplo.myapp.ui.components.*
 import com.ejemplo.myapp.ui.theme.*
 import com.ejemplo.myapp.ui.viewmodels.DashboardViewModel
 
 @Composable
 fun DashboardScreen(
+    navController: androidx.navigation.NavController, // Añadido para navegación
     viewModel: DashboardViewModel = viewModel(),
     onLaunchWorkout: () -> Unit,
     onSeeAllPlans: () -> Unit
@@ -74,7 +76,7 @@ fun DashboardScreen(
             title = workout.title,
             duration = workout.duration,
             level = workout.level,
-            onLaunch = onLaunchWorkout
+            onLaunch = { onLaunchWorkout() }
         )
         
         Spacer(modifier = Modifier.height(32.dp))
@@ -90,7 +92,10 @@ fun DashboardScreen(
             stringResource(R.string.challenges_title),
             stringResource(R.string.challenges_subtitle)
         )
-        ChallengesSection(challenges = challenges)
+        ChallengesSection(
+            challenges = challenges,
+            onClaim = { viewModel.claimChallenge(it) }
+        )
 
         Spacer(modifier = Modifier.height(32.dp))
         
@@ -101,14 +106,16 @@ fun DashboardScreen(
             stringResource(R.string.dashboard_activity_mobility),
             stringResource(R.string.dashboard_activity_mobility_time),
             Icons.Default.Schedule,
-            BrightBlue
+            BrightBlue,
+            onClick = { /* Implementar navegación o acción */ }
         )
         Spacer(modifier = Modifier.height(12.dp))
         ActivityItem(
             stringResource(R.string.dashboard_activity_nutrition),
-            stringResource(R.string.dashboard_activity_mobility_time), // Reusing a valid string for now to avoid build error
+            stringResource(R.string.dashboard_activity_nutrition_time),
             Icons.Default.Balance,
-            BrightLime
+            BrightLime,
+            onClick = { navController.navigate(Screen.Nutrition.route) }
         )
         
         Spacer(modifier = Modifier.height(100.dp))

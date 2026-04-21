@@ -25,6 +25,24 @@ import com.ejemplo.myapp.R
 import com.ejemplo.myapp.data.models.FruitChallenge
 import com.ejemplo.myapp.ui.theme.*
 
+import androidx.compose.ui.tooling.preview.Preview
+import com.ejemplo.myapp.ui.theme.FruiterManTheme
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewStatCard() {
+    FruiterManTheme {
+        StatCard(
+            label = "Weekly",
+            value = "5/5",
+            bottomText = "Workouts",
+            containerColor = Surface,
+            valueColor = BrightBlue,
+            icon = Icons.Default.FlashOn
+        )
+    }
+}
+
 @Composable
 fun StatCard(
     modifier: Modifier = Modifier,
@@ -39,7 +57,9 @@ fun StatCard(
     Card(
         modifier = modifier.height(140.dp),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = containerColor)
+        colors = CardDefaults.cardColors(containerColor = containerColor),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.05f))
     ) {
         Column(
             modifier = Modifier
@@ -200,7 +220,7 @@ fun VolumeChart(weeklyVolume: List<Double>) {
             .height(200.dp),
         shape = RoundedCornerShape(32.dp),
         colors = CardDefaults.cardColors(containerColor = Surface),
-        border = BorderStroke(1.dp, CardStroke)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(24.dp)) {
             Text(
@@ -250,12 +270,13 @@ private fun InternalTag(text: String, containerColor: Color = Surface, contentCo
 }
 
 @Composable
-fun ActivityItem(title: String, time: String, icon: ImageVector, color: Color) {
+fun ActivityItem(title: String, time: String, icon: ImageVector, color: Color, onClick: () -> Unit = {}) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))
             .background(Surface)
+            .clickable { onClick() }
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -277,17 +298,17 @@ fun ActivityItem(title: String, time: String, icon: ImageVector, color: Color) {
 }
 
 @Composable
-fun ChallengesSection(challenges: List<FruitChallenge>) {
+fun ChallengesSection(challenges: List<FruitChallenge>, onClaim: (String) -> Unit = {}) {
     Column(modifier = Modifier.fillMaxWidth()) {
         challenges.forEach { challenge ->
-            ChallengeItem(challenge)
+            ChallengeItem(challenge, onClaim)
             Spacer(modifier = Modifier.height(12.dp))
         }
     }
 }
 
 @Composable
-fun ChallengeItem(challenge: FruitChallenge) {
+fun ChallengeItem(challenge: FruitChallenge, onClaim: (String) -> Unit = {}) {
     val icon = when(challenge.icon.toString()) {
         "APPLE" -> Icons.Default.Star 
         "BANANA" -> Icons.Default.FlashOn
@@ -302,7 +323,7 @@ fun ChallengeItem(challenge: FruitChallenge) {
             .clip(RoundedCornerShape(24.dp))
             .background(Surface)
             .border(
-                BorderStroke(1.dp, if (challenge.isCompleted) BrightLime.copy(alpha = 0.3f) else Color.Transparent),
+                BorderStroke(1.dp, if (challenge.isCompleted && !challenge.isClaimed) BrightLime.copy(alpha = 0.5f) else Color.Transparent),
                 RoundedCornerShape(24.dp)
             )
             .padding(16.dp),
@@ -312,13 +333,13 @@ fun ChallengeItem(challenge: FruitChallenge) {
             modifier = Modifier
                 .size(48.dp)
                 .clip(CircleShape)
-                .background(color.copy(alpha = 0.1f)),
+                .background(if (challenge.isClaimed) OnSurfaceVariant.copy(alpha = 0.1f) else color.copy(alpha = 0.1f)),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = icon, 
                 contentDescription = null, 
-                tint = color, 
+                tint = if (challenge.isClaimed) OnSurfaceVariant else color, 
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -330,7 +351,7 @@ fun ChallengeItem(challenge: FruitChallenge) {
                 text = challenge.title, 
                 fontWeight = FontWeight.Black, 
                 fontSize = 16.sp,
-                color = if (challenge.isCompleted) BrightLime else OnSurface
+                color = if (challenge.isClaimed) OnSurfaceVariant else if (challenge.isCompleted) BrightLime else OnSurface
             )
             Text(
                 text = challenge.description, 
@@ -346,17 +367,28 @@ fun ChallengeItem(challenge: FruitChallenge) {
                     .fillMaxWidth()
                     .height(6.dp)
                     .clip(CircleShape),
-                color = color,
+                color = if (challenge.isClaimed) OnSurfaceVariant else color,
                 trackColor = color.copy(alpha = 0.1f)
             )
         }
         
-        if (challenge.isCompleted) {
+        if (challenge.isCompleted && !challenge.isClaimed) {
+            Spacer(modifier = Modifier.width(12.dp))
+            Button(
+                onClick = { onClaim(challenge.id) },
+                colors = ButtonDefaults.buttonColors(containerColor = BrightLime),
+                contentPadding = PaddingValues(horizontal = 12.dp),
+                modifier = Modifier.height(32.dp),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text(stringResource(R.string.challenge_reward_claim), fontSize = 10.sp, fontWeight = FontWeight.Black, color = Background)
+            }
+        } else if (challenge.isClaimed) {
             Spacer(modifier = Modifier.width(12.dp))
             Icon(
                 Icons.Default.CheckCircle, 
                 contentDescription = null, 
-                tint = BrightLime,
+                tint = OnSurfaceVariant,
                 modifier = Modifier.size(24.dp)
             )
         }

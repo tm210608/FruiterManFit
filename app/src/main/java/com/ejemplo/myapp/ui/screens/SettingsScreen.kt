@@ -17,7 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.ejemplo.myapp.R
 import com.ejemplo.myapp.ui.components.*
 import com.ejemplo.myapp.ui.theme.*
@@ -27,7 +27,7 @@ import com.ejemplo.myapp.ui.viewmodels.DashboardViewModel
 fun SettingsScreen(
     onBack: () -> Unit,
     onLogout: () -> Unit,
-    viewModel: DashboardViewModel = viewModel()
+    viewModel: DashboardViewModel = hiltViewModel()
 ) {
     val stats by viewModel.stats.collectAsState()
 

@@ -71,5 +71,6 @@ data class FruitChallengeEntity(
     val progress: Float,
     val target: Float,
     val isCompleted: Boolean = false,
+    val isClaimed: Boolean = false,
     val category: String // e.g., "DAILY", "WEEKLY"
 )

@@ -66,6 +66,9 @@ interface FitnessDao {
 
     @Query("UPDATE fruit_challenges SET progress = :progress, isCompleted = :isCompleted WHERE id = :id")
     suspend fun updateChallengeProgress(id: String, progress: Float, isCompleted: Boolean)
+
+    @Query("UPDATE fruit_challenges SET isClaimed = 1 WHERE id = :id")
+    suspend fun claimChallenge(id: String)
 }
 
 data class SessionExerciseWithSets(

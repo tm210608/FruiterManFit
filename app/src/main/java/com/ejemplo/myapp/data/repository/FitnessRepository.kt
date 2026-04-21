@@ -24,8 +24,8 @@ class FitnessRepository @Inject constructor(
         return fitnessDao.getAllChallenges().map { entities ->
             if (entities.isEmpty()) {
                 val initial = listOf(
-                    FruitChallengeEntity("1", "Apple Power", "Complete 3 chest exercises", "APPLE", 0f, 3f, false, "DAILY"),
-                    FruitChallengeEntity("2", "Banana Boost", "Train 3 days in a row", "BANANA", 1f, 3f, false, "WEEKLY")
+                    FruitChallengeEntity("1", "Apple Power", "Complete 3 chest exercises", "APPLE", 0f, 3f, false, false, "DAILY"),
+                    FruitChallengeEntity("2", "Banana Boost", "Train 3 days in a row", "BANANA", 1f, 3f, false, false, "WEEKLY")
                 )
                 fitnessDao.insertChallenges(initial)
                 initial.map { it.toDomain() }
@@ -35,13 +35,18 @@ class FitnessRepository @Inject constructor(
         }
     }
 
+    suspend fun claimChallenge(id: String) {
+        fitnessDao.claimChallenge(id)
+    }
+
     private fun FruitChallengeEntity.toDomain() = FruitChallenge(
         id = id,
         title = title,
         description = description,
         icon = iconType,
         progress = progress / target,
-        isCompleted = isCompleted
+        isCompleted = isCompleted,
+        isClaimed = isClaimed
     )
 
     // Exercises from Local DB

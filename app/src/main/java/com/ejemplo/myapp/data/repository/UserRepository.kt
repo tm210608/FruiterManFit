@@ -3,8 +3,9 @@ package com.ejemplo.myapp.data.repository
 import com.ejemplo.myapp.data.local.dao.FitnessDao
 import com.ejemplo.myapp.data.local.entities.UserEntity
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-class UserRepository(private val fitnessDao: FitnessDao) {
+class UserRepository @Inject constructor(private val fitnessDao: FitnessDao) {
 
     fun getCurrentUser(): Flow<UserEntity?> = fitnessDao.getUser()
 

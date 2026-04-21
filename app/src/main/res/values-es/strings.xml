@@ -25,6 +25,19 @@
     <string name="dashboard_activity_mobility">Movilidad Mañana</string>
     <string name="dashboard_activity_mobility_time">En 2 horas</string>
     <string name="dashboard_activity_nutrition">Registro Nutrición</string>
+    <string name="dashboard_activity_nutrition_time">Registro de hoy</string>
+
+    <!-- Pantalla de Nutrición -->
+    <string name="nutrition_title">REGISTRO NUTRICIONAL</string>
+    <string name="nutrition_target_calories">Objetivo: %1$d kcal</string>
+    <string name="nutrition_consumed">Consumido</string>
+    <string name="nutrition_remaining">Restante</string>
+    <string name="nutrition_add_meal">AÑADIR COMIDA</string>
+    <string name="nutrition_meal_breakfast">Desayuno</string>
+    <string name="nutrition_meal_lunch">Almuerzo</string>
+    <string name="nutrition_meal_dinner">Cena</string>
+    <string name="nutrition_meal_snack">Snack</string>
+    <string name="nutrition_empty">Aún no has registrado nada. ¡Come algo de fruta!</string>
     <string name="dashboard_action_start_now">EMPEZAR AHORA</string>
     <string name="dashboard_chart_volume_title">VOLUMEN SEMANAL</string>
 
@@ -39,6 +52,10 @@
     <string name="category_cardio">Cardio</string>
     <string name="category_upper_arms">Brazos superiores</string>
     <string name="category_lower_arms">Antebrazos</string>
+    <string name="category_upper_legs">Piernas (Muslo)</string>
+    <string name="category_lower_legs">Piernas (Gemelo)</string>
+    <string name="category_shoulders">Hombros</string>
+    <string name="category_neck">Cuello</string>
     <string name="library_action_refresh">ACTUALIZAR</string>
     <string name="library_action_view_instructions">VER INSTRUCCIONES</string>
     <string name="library_action_add_to_workout">AÑADIR AL ENTRENAMIENTO</string>
@@ -58,6 +75,8 @@
     <string name="detail_instructions_title">INSTRUCCIONES</string>
     <string name="detail_action_add">AÑADIR AL ENTRENAMIENTO</string>
     <string name="detail_action_start">EMPEZAR EJERCICIO</string>
+    <string name="detail_no_preview">Vista previa no disponible</string>
+    <string name="detail_title">Detalles del Ejercicio</string>
     <string name="detail_loading">Cargando detalles…</string>
     <!-- Settings Screen -->
     <string name="settings_title">Ajustes</string>
@@ -89,4 +108,17 @@
     <string name="challenge_banana_desc">Entrena 3 días seguidos</string>
     <string name="challenge_reward_claim">RECLAMAR FRUTA</string>
 
+    <!-- Pantallas de Autenticación -->
+    <string name="auth_slogan">Ponte Jugoso. Ponte Fit.</string>
+    <string name="login_welcome">Bienvenido de nuevo</string>
+    <string name="login_email_label">CORREO ELECTRÓNICO</string>
+    <string name="login_password_label">CONTRASEÑA</string>
+    <string name="login_button">¡VAMOS!</string>
+    <string name="login_signup_prompt">¿Eres nuevo en el árbol? </string>
+    <string name="login_signup_action">Regístrate</string>
+
+    <string name="signup_title">Únete al Árbol</string>
+    <string name="signup_name_label">NOMBRE COMPLETO</string>
+    <string name="signup_button">PLANTAR MI SEMILLA</string>
+    <string name="signup_disclaimer">Al registrarte, aceptas convertirte en fruta 100% natural.</string>
 </resources>

@@ -16,33 +16,35 @@ Este documento detalla la hoja de ruta para profesionalizar la aplicación y opt
 **Objetivo:** Eliminar el inglés de la interfaz y centralizar todos los textos.
 
 - [x] **Migración a `strings.xml`**: Dashboard migrado.
-- [ ] **Traducción de Categorías**: Traducir "Chest", "Waist", "Back", etc., en la lógica de filtrado y visualización.
+- [x] **Traducción de Categorías**: Traducidas en Biblioteca y Detalle usando `translateCategory`.
+- [x] **Localización de Auth**: Login y Signup migrados a `strings.xml`.
 
 ## 🧹 2. Limpieza de Datos Hardcodeados
 **Objetivo:** Hacer que la app sea dinámica y personalizable.
 
-- [x] **Sistema de Usuarios**: Eliminar el usuario "invitado" hardcodeado en los ViewModels. Implementar una entidad `UserEntity` en Room.
+- [x] **Sistema de Usuarios**: Eliminado el usuario "invitado". Implementada `UserEntity`.
 - [x] **Infraestructura de Usuarios (DAO/Repo/ViewModel)**: Implementados.
-- [ ] **Flujo de Login Real**: Conectar las pantallas de Login/Signup con el repositorio de usuarios.
+- [x] **Flujo de Login Real**: Conectado con `UserRepository`.
+- [x] **Gestión de Sesión**: Implementado autologin en `SplashScreen`.
 
 ## 🎨 3. UI/UX: Simplicidad y Amigabilidad
 **Objetivo:** Menos es más. Hacer la app más intuitiva siguiendo Material 3.
 
-- [ ] **Rediseño de Tarjetas**: Mejorar contraste y legibilidad.
-- [ ] **Botones Fantasma**: Eliminar o implementar acciones para botones sin funcionalidad.
+- [ ] **Rediseño de Tarjetas**: Mejorar contraste, añadir bordes suaves y profundidad.
+- [ ] **Interactividad**: Hacer que los items de actividad en el Dashboard sean accionables o informativos.
 
 ## 🚀 4. Nueva Feature: "Retos de Frutas"
 **Objetivo:** Gamificación.
 
-- [ ] **Feature: Fruit Challenges**: Implementar retos diarios con recompensas visuales.
+- [x] **Infraestructura de Retos**: DAO y Repository listos.
+- [ ] **UI: Fruit Challenges**: Añadir botón de reclamo y feedback visual al completar.
 
 ---
 ## 📅 Backlog de Desarrollo (Tickets próximos)
 
-- [ ] **Ticket #1: Crear UserViewModel**: Implementar lógica para registrar/loguear usuarios.
-- [ ] **Ticket #2: Integrar LoginScreen**: Conectar campos de texto a ViewModel y persistencia.
-- [ ] **Ticket #3: Integrar SignupScreen**: Validar inputs y llamar a `UserRepository.registerUser`.
-- [ ] **Ticket #4: Gestión de Sesión**: Implementar lógica de autologin/redirigir a Dashboard si el usuario ya existe.
+- [ ] **Ticket #5: Rediseño Visual**: Aplicar elevación y bordes consistentes en `DashboardComponents`.
+- [ ] **Ticket #6: Gamificación Retos**: Implementar botón "Reclamar" en `ChallengeItem`.
+- [ ] **Ticket #7: Refactor ActivityItem**: Añadir navegación a registro de nutrición/movilidad.
 
 ---
 ## ⚡ Notas para IA (Optimización de Contexto)
