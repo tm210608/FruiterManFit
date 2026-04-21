@@ -8,9 +8,9 @@ Este documento detalla la hoja de ruta para profesionalizar la aplicación y opt
 **Objetivo:** Reducir el ruido y el consumo de tokens.
 
 - [x] **Estructura I18n**: Creados `values/strings.xml` y `values-es/strings.xml`.
-- [ ] **Context Sync**: Mantener un archivo `.context_sync.json` para evitar re-lecturas innecesarias de archivos grandes.
-- [ ] **Edición Quirúrgica**: Priorizar `replace_file_content` sobre `write_file` para archivos extensos.
-- [ ] **Comunicación Concisa**: Uso de comandos claros y objetivos específicos por turno.
+- [x] **Context Sync**: Mantener un archivo `.context_sync.json` para evitar re-lecturas innecesarias de archivos grandes.
+- [x] **Edición Quirúrgica**: Priorizar `replace_file_content` sobre `write_file` para archivos extensos.
+- [x] **Comunicación Concisa**: Uso de comandos claros y objetivos específicos por turno.
 
 ## 🛠 1. Internacionalización y Textos (Español)
 **Objetivo:** Eliminar el inglés de la interfaz y centralizar todos los textos.
@@ -22,6 +22,7 @@ Este documento detalla la hoja de ruta para profesionalizar la aplicación y opt
 **Objetivo:** Hacer que la app sea dinámica y personalizable.
 
 - [x] **Sistema de Usuarios**: Eliminar el usuario "invitado" hardcodeado en los ViewModels. Implementar una entidad `UserEntity` en Room.
+- [x] **Infraestructura de Usuarios (DAO/Repo/ViewModel)**: Implementados.
 - [ ] **Flujo de Login Real**: Conectar las pantallas de Login/Signup con el repositorio de usuarios.
 
 ## 🎨 3. UI/UX: Simplicidad y Amigabilidad
