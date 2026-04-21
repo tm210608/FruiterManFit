@@ -33,6 +33,12 @@
     <string name="library_subtitle">%1$d movements loaded</string>
     <string name="library_search_hint">Search exercise…</string>
     <string name="library_filter_all">All</string>
+    <string name="category_waist">Waist</string>
+    <string name="category_chest">Chest</string>
+    <string name="category_back">Back</string>
+    <string name="category_cardio">Cardio</string>
+    <string name="category_upper_arms">Upper Arms</string>
+    <string name="category_lower_arms">Lower Arms</string>
     <string name="library_action_refresh">REFRESH</string>
     <string name="library_action_view_instructions">VIEW INSTRUCTIONS</string>
     <string name="library_action_add_to_workout">ADD TO WORKOUT</string>

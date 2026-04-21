@@ -33,6 +33,12 @@
     <string name="library_subtitle">%1$d ejercicios cargados</string>
     <string name="library_search_hint">Buscar ejercicio...</string>
     <string name="library_filter_all">Todo</string>
+    <string name="category_waist">Cintura</string>
+    <string name="category_chest">Pecho</string>
+    <string name="category_back">Espalda</string>
+    <string name="category_cardio">Cardio</string>
+    <string name="category_upper_arms">Brazos superiores</string>
+    <string name="category_lower_arms">Antebrazos</string>
     <string name="library_action_refresh">ACTUALIZAR</string>
     <string name="library_action_view_instructions">VER INSTRUCCIONES</string>
     <string name="library_action_add_to_workout">AÑADIR AL ENTRENAMIENTO</string>

@@ -126,7 +126,7 @@ class WorkoutSessionViewModel @Inject constructor(
                     sets = listOf(SessionSet(1, "0", "0", false)),
                     gifUrl = it.gifUrl
                 )
-                _activeExercises.value = _activeExercises.value + newActiveExercise
+                _activeExercises.value += newActiveExercise
             }
         }
     }

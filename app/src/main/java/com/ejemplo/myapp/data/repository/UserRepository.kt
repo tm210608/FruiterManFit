@@ -18,9 +18,12 @@ class UserRepository(private val fitnessDao: FitnessDao) {
         fitnessDao.insertUser(newUser)
     }
 
-    suspend fun loginUser(email: String, password: String): Boolean {
-        // En una app real, aquí harías una consulta específica para validar credenciales
-        // Por ahora mantenemos la simplicidad de la estructura de Room
-        return true 
+    suspend fun loginUser(email: String, password: String): UserEntity? {
+        val user = fitnessDao.getUserByEmail(email)
+        return if (user != null && user.password == password) {
+            user
+        } else {
+            null
+        }
     }
 }

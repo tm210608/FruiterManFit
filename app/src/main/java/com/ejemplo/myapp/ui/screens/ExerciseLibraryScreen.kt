@@ -214,7 +214,16 @@ fun ExerciseLibraryScreen(
         
         Spacer(modifier = Modifier.height(24.dp))
         
-        val filters = listOf("Todo", "waist", "chest", "back", "cardio", "upper arms", "lower arms", "upper legs", "lower legs", "shoulders")
+        val filters = listOf(
+            stringResource(R.string.library_filter_all),
+            stringResource(R.string.category_waist),
+            stringResource(R.string.category_chest),
+            stringResource(R.string.category_back),
+            stringResource(R.string.category_cardio),
+            stringResource(R.string.category_upper_arms),
+            stringResource(R.string.category_lower_arms),
+            "upper legs", "lower legs", "shoulders"
+        )
         LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             items(filters) { filter ->
                 val isSelected = filter == selectedFilter
