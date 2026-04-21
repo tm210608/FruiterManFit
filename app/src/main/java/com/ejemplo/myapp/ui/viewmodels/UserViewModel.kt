@@ -7,6 +7,7 @@ import com.ejemplo.myapp.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -44,5 +45,11 @@ class UserViewModel @Inject constructor(
                 onResult(false)
             }
         }
+    }
+
+    suspend fun checkExistingSession(): UserEntity? {
+        // En una app real, aquí usaríamos DataStore o SharedPreferences.
+        // Como Room ya persiste al usuario, simplemente recuperamos el usuario existente.
+        return repository.getCurrentUser().firstOrNull()
     }
 }
