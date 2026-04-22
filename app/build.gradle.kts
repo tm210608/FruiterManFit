@@ -85,4 +85,5 @@ dependencies {
     // Coil (Image loading with GIF support)
     implementation(libs.coil.compose)
     implementation(libs.coil.gif)
+    implementation(libs.lottie)
 }

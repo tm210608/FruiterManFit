@@ -1,6 +1,8 @@
 package com.ejemplo.myapp.ui.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -15,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -44,9 +47,10 @@ fun NutritionLogScreen(onBack: () -> Unit) {
                 onClick = { /* TODO: Add meal dialog */ },
                 containerColor = BrightLime,
                 contentColor = Background,
-                shape = CircleShape
+                shape = CircleShape,
+                elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 8.dp)
             ) {
-                Icon(Icons.Default.Add, contentDescription = null)
+                Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(28.dp))
             }
         }
     ) { padding ->
@@ -56,51 +60,69 @@ fun NutritionLogScreen(onBack: () -> Unit) {
                 .padding(padding)
                 .padding(horizontal = 24.dp)
         ) {
-            // Summary Card
+            // Summary Card with better elevation and design
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 16.dp),
                 shape = RoundedCornerShape(32.dp),
-                colors = CardDefaults.cardColors(containerColor = Surface)
+                colors = CardDefaults.cardColors(containerColor = Surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.05f))
             ) {
                 Column(modifier = Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = stringResource(R.string.nutrition_target_calories, 2200),
                         color = OnSurfaceVariant,
                         fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.sp
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
                     Box(contentAlignment = Alignment.Center) {
                         CircularProgressIndicator(
                             progress = 0.65f,
-                            modifier = Modifier.size(160.dp),
-                            strokeWidth = 12.dp,
+                            modifier = Modifier.size(170.dp),
+                            strokeWidth = 14.dp,
                             color = BrightLime,
                             trackColor = Color.White.copy(alpha = 0.05f)
                         )
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(text = "1430", fontSize = 36.sp, fontWeight = FontWeight.Black, color = OnSurface)
-                            Text(text = "kcal", fontSize = 14.sp, color = OnSurfaceVariant)
+                            Text(text = "1430", fontSize = 42.sp, fontWeight = FontWeight.Black, color = OnSurface)
+                            Text(text = "kcal", fontSize = 16.sp, color = OnSurfaceVariant, fontWeight = FontWeight.Medium)
                         }
                     }
-                    Spacer(modifier = Modifier.height(24.dp))
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
+                    Spacer(modifier = Modifier.height(28.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ) {
                         NutritionStat(stringResource(R.string.nutrition_consumed), "1430", BrightBlue)
+                        Box(modifier = Modifier.width(1.dp).height(40.dp).background(OnSurfaceVariant.copy(alpha = 0.2f)))
                         NutritionStat(stringResource(R.string.nutrition_remaining), "770", BrightLime)
                     }
                 }
             }
 
-            Text(
-                text = "MEALS",
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Black,
-                letterSpacing = 2.sp,
-                color = OnSurfaceVariant,
-                modifier = Modifier.padding(vertical = 16.dp)
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.nutrition_meal_breakfast).split(" ")[0].uppercase(), // Simplified label
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Black,
+                    letterSpacing = 2.sp,
+                    color = OnSurfaceVariant
+                )
+                Text(
+                    text = "4 ITEMS",
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = BrightLime
+                )
+            }
 
             // Example List
             val meals = listOf(
@@ -110,7 +132,7 @@ fun NutritionLogScreen(onBack: () -> Unit) {
                 MealItem(stringResource(R.string.nutrition_meal_dinner), "Salmon Salad", 280)
             )
 
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 items(meals) { meal ->
                     MealRow(meal)
                 }
@@ -123,8 +145,14 @@ fun NutritionLogScreen(onBack: () -> Unit) {
 @Composable
 fun NutritionStat(label: String, value: String, color: Color) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = label.uppercase(), fontSize = 10.sp, fontWeight = FontWeight.Bold, color = OnSurfaceVariant)
-        Text(text = value, fontSize = 20.sp, fontWeight = FontWeight.Black, color = color)
+        Text(
+            text = label.uppercase(),
+            fontSize = 10.sp,
+            fontWeight = FontWeight.Bold,
+            color = OnSurfaceVariant,
+            letterSpacing = 0.5.sp
+        )
+        Text(text = value, fontSize = 22.sp, fontWeight = FontWeight.Black, color = color)
     }
 }
 
@@ -133,26 +161,48 @@ fun MealRow(meal: MealItem) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
+            .clip(RoundedCornerShape(24.dp))
             .background(Surface)
+            .border(BorderStroke(1.dp, Color.White.copy(alpha = 0.05f)), RoundedCornerShape(24.dp))
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier
-                .size(40.dp)
-                .clip(RoundedCornerShape(12.dp))
+                .size(48.dp)
+                .clip(RoundedCornerShape(16.dp))
                 .background(BrightLime.copy(alpha = 0.1f)),
             contentAlignment = Alignment.Center
         ) {
-            Icon(Icons.Default.Restaurant, contentDescription = null, tint = BrightLime, modifier = Modifier.size(20.dp))
+            Icon(
+                Icons.Default.Restaurant,
+                contentDescription = null,
+                tint = BrightLime,
+                modifier = Modifier.size(24.dp)
+            )
         }
         Spacer(modifier = Modifier.width(16.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = meal.type.uppercase(), fontSize = 10.sp, fontWeight = FontWeight.Bold, color = BrightLime)
-            Text(text = meal.name, fontWeight = FontWeight.Bold, fontSize = 15.sp, color = OnSurface)
+            Text(
+                text = meal.type.uppercase(),
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                color = BrightLime,
+                letterSpacing = 0.5.sp
+            )
+            Text(
+                text = meal.name,
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+                color = OnSurface
+            )
         }
-        Text(text = "${meal.calories} kcal", fontWeight = FontWeight.Black, fontSize = 14.sp, color = OnSurface)
+        Text(
+            text = "${meal.calories} kcal",
+            fontWeight = FontWeight.Black,
+            fontSize = 15.sp,
+            color = OnSurface
+        )
     }
 }
 
