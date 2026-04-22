@@ -107,7 +107,7 @@ fun DashboardScreen(
             stringResource(R.string.dashboard_activity_mobility_time),
             Icons.Default.Schedule,
             BrightBlue,
-            onClick = { /* Implementar navegación o acción */ }
+            onClick = { navController.navigate(Screen.Mobility.route) }
         )
         Spacer(modifier = Modifier.height(12.dp))
         ActivityItem(

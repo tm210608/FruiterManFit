@@ -157,5 +157,8 @@ fun SetupNavGraph(
         composable(Screen.Nutrition.route) {
             NutritionLogScreen(onBack = { navController.popBackStack() })
         }
+        composable(Screen.Mobility.route) {
+            MobilityScreen(onBack = { navController.popBackStack() })
+        }
     }
 }
