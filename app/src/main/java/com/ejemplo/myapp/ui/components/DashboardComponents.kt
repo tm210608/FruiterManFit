@@ -10,7 +10,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.ui.window.Dialog
+import kotlinx.coroutines.delay
+
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -316,6 +319,21 @@ fun ChallengeItem(challenge: FruitChallenge, onClaim: (String) -> Unit = {}) {
     }
     
     val color = if (challenge.isCompleted) BrightLime else BrightBlue
+    var showAnimation by remember { mutableStateOf(value = false) }
+
+    if (showAnimation) {
+        LaunchedEffect(Unit) {
+            delay(2000)
+            showAnimation = false
+        }
+        Dialog(onDismissRequest = { showAnimation = false }) {
+            Surface(shape = RoundedCornerShape(24.dp), color = Surface, modifier = Modifier.padding(16.dp)) {
+                Box(modifier = Modifier.size(200.dp), contentAlignment = Alignment.Center) {
+                    Text("¡Reto Reclamado!", fontWeight = FontWeight.Black, fontSize = 20.sp, color = BrightLime)
+                }
+            }
+        }
+    }
 
     Row(
         modifier = Modifier
@@ -362,7 +380,7 @@ fun ChallengeItem(challenge: FruitChallenge, onClaim: (String) -> Unit = {}) {
             Spacer(modifier = Modifier.height(8.dp))
             
             LinearProgressIndicator(
-                progress = challenge.progress,
+                progress = { challenge.progress },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(6.dp)
@@ -375,7 +393,10 @@ fun ChallengeItem(challenge: FruitChallenge, onClaim: (String) -> Unit = {}) {
         if (challenge.isCompleted && !challenge.isClaimed) {
             Spacer(modifier = Modifier.width(12.dp))
             Button(
-                onClick = { onClaim(challenge.id) },
+                onClick = { 
+                    showAnimation = true
+                    onClaim(challenge.id) 
+                },
                 colors = ButtonDefaults.buttonColors(containerColor = BrightLime),
                 contentPadding = PaddingValues(horizontal = 12.dp),
                 modifier = Modifier.height(32.dp),
