@@ -121,4 +121,10 @@
     <string name="signup_name_label">FULL NAME</string>
     <string name="signup_button">PLANT MY SEED</string>
     <string name="signup_disclaimer">By signing up, you agree to become 100% natural fruit.</string>
+
+    <!-- History Screen -->
+    <string name="history_title">WORKOUT HISTORY</string>
+    <string name="history_empty">No sessions recorded yet. Let\'s go!</string>
+    <string name="history_item_duration">%1$d min</string>
+    <string name="history_item_calories">%1$d kcal</string>
 </resources>

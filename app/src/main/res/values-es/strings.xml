@@ -121,4 +121,10 @@
     <string name="signup_name_label">NOMBRE COMPLETO</string>
     <string name="signup_button">PLANTAR MI SEMILLA</string>
     <string name="signup_disclaimer">Al registrarte, aceptas convertirte en fruta 100% natural.</string>
+
+    <!-- History Screen -->
+    <string name="history_title">HISTORIAL DE ENTRENOS</string>
+    <string name="history_empty">No hay sesiones registradas aún. ¡A darle!</string>
+    <string name="history_item_duration">%1$d min</string>
+    <string name="history_item_calories">%1$d kcal</string>
 </resources>
