@@ -118,3 +118,19 @@ fun HistoryItem(session: WorkoutSessionEntity) {
         }
     }
 }
+
+@androidx.compose.ui.tooling.preview.Preview(showBackground = true)
+@Composable
+fun PreviewHistoryItem() {
+    FruiterManTheme {
+        HistoryItem(
+            session = WorkoutSessionEntity(
+                id = 1,
+                title = "CITRUS SHRED",
+                startTime = System.currentTimeMillis(),
+                duration = 2700000,
+                totalCalories = 450
+            )
+        )
+    }
+}

@@ -2,6 +2,7 @@ package com.ejemplo.myapp.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ejemplo.myapp.data.local.entities.WorkoutSessionEntity
 import com.ejemplo.myapp.data.models.*
 import com.ejemplo.myapp.domain.usecase.GetExercisesUseCase
 import com.ejemplo.myapp.data.repository.FitnessRepository
