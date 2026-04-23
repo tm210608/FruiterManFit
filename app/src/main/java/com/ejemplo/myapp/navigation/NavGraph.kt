@@ -148,9 +148,9 @@ fun SetupNavGraph(
             )
         }
         composable(Screen.History.route) {
-            val detailViewModel: ExerciseDetailViewModel = hiltViewModel() // Using detailViewModel for repo access or create a dedicated one
+            val historyViewModel: HistoryViewModel = hiltViewModel()
             HistoryScreen(
-                repository = detailViewModel.repository,
+                viewModel = historyViewModel,
                 onBack = { navController.popBackStack() }
             )
         }
