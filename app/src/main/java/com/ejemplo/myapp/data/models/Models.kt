@@ -35,7 +35,8 @@ data class UserStats(
     val totalVolume: Double = 0.0,
     val weeklyVolume: List<Double> = emptyList(),
     val weeklySessionsCount: Int = 0,
-    val weeklyGoal: Int = 5
+    val weeklyGoal: Int = 5,
+    val badges: List<Badge> = emptyList()
 )
 
 data class SessionSet(
@@ -62,4 +63,11 @@ data class FruitChallenge(
     val progress: Float,
     val isCompleted: Boolean = false,
     val isClaimed: Boolean = false
+)
+
+data class Badge(
+    val id: String,
+    val title: String,
+    val icon: Any,
+    val isUnlocked: Boolean = false
 )

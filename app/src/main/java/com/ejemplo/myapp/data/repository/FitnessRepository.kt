@@ -12,6 +12,10 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.FlashOn
+import androidx.compose.material.icons.filled.Star
 import javax.inject.Inject
 
 class FitnessRepository @Inject constructor(
@@ -152,6 +156,12 @@ class FitnessRepository @Inject constructor(
             val sessionsThisWeek = fullSessions.filter { it.session.startTime >= weekStart }
             val weeklySessionsCount = sessionsThisWeek.size
 
+            val badges = listOf(
+                Badge("1", "Primer Paso", Icons.Default.Star, sessionCount >= 1),
+                Badge("2", "Guerrero Frutal", Icons.Default.FlashOn, sessionCount >= 10),
+                Badge("3", "Leyenda Cítrica", Icons.Default.EmojiEvents, sessionCount >= 50)
+            )
+
             val weeklyVolume = (0..6).map { dayOffset ->
                 val dayStart = now - (6 - dayOffset + 1) * dayMillis
                 val dayEnd = now - (6 - dayOffset) * dayMillis
@@ -178,7 +188,8 @@ class FitnessRepository @Inject constructor(
                 totalVolume = totalVolume,
                 weeklyVolume = weeklyVolume,
                 weeklySessionsCount = weeklySessionsCount,
-                weeklyGoal = user?.weeklyGoal ?: 5
+                weeklyGoal = user?.weeklyGoal ?: 5,
+                badges = badges
             )
         }
     }
