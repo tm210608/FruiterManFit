@@ -12,6 +12,18 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
+class HistoryViewModel @Inject constructor(
+    private val repository: FitnessRepository
+) : ViewModel() {
+    val sessions: StateFlow<List<WorkoutSessionEntity>> = repository.getAllSessions()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+}
+
+@HiltViewModel
 class DashboardViewModel @Inject constructor(
     private val repository: FitnessRepository
 ) : ViewModel() {
