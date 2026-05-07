@@ -4,9 +4,13 @@ import com.google.gson.annotations.SerializedName
 import retrofit2.http.GET
 
 interface ExerciseApiService {
-    // Apuntamos al archivo JSON que contiene los 1327 ejercicios con el esquema original de ExerciseDB
-    @GET("exercises.json")
+    // WorkoutX API endpoint - devuelve todos los ejercicios con GIFs
+    @GET("exercises")
     suspend fun getFullDataset(): List<ExerciseDto>
+
+    // Filtrar por parte del cuerpo (opcional)
+    @GET("exercises/bodyPart/{bodyPart}")
+    suspend fun getExercisesByBodyPart(@retrofit2.http.Path("bodyPart") bodyPart: String): List<ExerciseDto>
 
     // Funciones legacy
     suspend fun getAllExercises(): List<ExerciseDto> = getFullDataset()

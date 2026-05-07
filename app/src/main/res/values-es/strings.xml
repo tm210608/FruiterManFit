@@ -106,7 +106,9 @@
     <string name="challenge_apple_desc">Completa 3 ejercicios de pecho</string>
     <string name="challenge_banana_title">Impulso Plátano</string>
     <string name="challenge_banana_desc">Entrena 3 días seguidos</string>
-    <string name="challenge_reward_claim">RECLAMAR FRUTA</string>
+    <string name="challenge_reward_claim">RECLAMAR</string>
+    <string name="challenge_completed_title">¡RETO COMPLETADO!</string>
+    <string name="challenge_completed_subtitle">Has ganado una recompensa frutal</string>
 
     <!-- Pantallas de Autenticación -->
     <string name="auth_slogan">Ponte Jugoso. Ponte Fit.</string>

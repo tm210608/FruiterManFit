@@ -27,9 +27,10 @@ class FitnessRepository @Inject constructor(
     fun getFruitChallenges(): Flow<List<FruitChallenge>> {
         return fitnessDao.getAllChallenges().map { entities ->
             if (entities.isEmpty()) {
+                val now = System.currentTimeMillis()
                 val initial = listOf(
-                    FruitChallengeEntity("1", "Apple Power", "Complete 3 chest exercises", "APPLE", 0f, 3f, false, false, "DAILY"),
-                    FruitChallengeEntity("2", "Banana Boost", "Train 3 days in a row", "BANANA", 1f, 3f, false, false, "WEEKLY")
+                    FruitChallengeEntity("1", "Apple Power", "Complete 3 chest exercises", "APPLE", 0f, 3f, false, false, "DAILY", createdAt = now, updatedAt = now),
+                    FruitChallengeEntity("2", "Banana Boost", "Train 3 days in a row", "BANANA", 1f, 3f, false, false, "WEEKLY", createdAt = now, updatedAt = now)
                 )
                 fitnessDao.insertChallenges(initial)
                 initial.map { it.toDomain() }
@@ -77,10 +78,11 @@ class FitnessRepository @Inject constructor(
             
             Log.d("FruiterMan", "Descargados ${allExercises.size} ejercicios con éxito.")
 
+            val now = System.currentTimeMillis()
             val entities = allExercises
                 .filter { it.id != null }
                 .distinctBy { it.id }
-                .map { it.toEntity() }
+                .map { it.toEntity(now) }
             
             fitnessDao.clearExercises() 
             fitnessDao.insertExercises(entities)
@@ -95,12 +97,16 @@ class FitnessRepository @Inject constructor(
 
     // Sessions
     suspend fun saveWorkoutSession(title: String, durationMillis: Long, calories: Int, activeExercises: List<ActiveExercise>) {
+        val now = System.currentTimeMillis()
         val sessionId = fitnessDao.insertSession(
             WorkoutSessionEntity(
                 title = title,
                 startTime = System.currentTimeMillis(),
                 duration = durationMillis,
-                totalCalories = calories
+                totalCalories = calories,
+                syncStatus = "DIRTY",
+                createdAt = now,
+                updatedAt = now
             )
         )
 
@@ -111,7 +117,10 @@ class FitnessRepository @Inject constructor(
                     exerciseId = exercise.exerciseId,
                     exerciseName = exercise.name,
                     accentColorHex = String.format("#%06X", (0xFFFFFF and exercise.accentColor.toArgb())),
-                    gifUrl = exercise.gifUrl
+                    gifUrl = exercise.gifUrl,
+                    syncStatus = "DIRTY",
+                    createdAt = now,
+                    updatedAt = now
                 )
             )
 
@@ -122,7 +131,10 @@ class FitnessRepository @Inject constructor(
                         setNumber = set.number,
                         weight = set.weight.toDoubleOrNull() ?: 0.0,
                         reps = set.reps.toIntOrNull() ?: 0,
-                        isDone = set.isDone
+                        isDone = set.isDone,
+                        syncStatus = "DIRTY",
+                        createdAt = now,
+                        updatedAt = now
                     )
                 )
             }
@@ -249,18 +261,13 @@ class FitnessRepository @Inject constructor(
         category = category
     )
 
-    private fun ExerciseDto.toEntity() = ExerciseEntity(
+    private fun ExerciseDto.toEntity(timestamp: Long = System.currentTimeMillis()) = ExerciseEntity(
         id = id ?: "",
         name = name ?: "Unknown",
         bodyPart = bodyPart ?: "Various",
         equipment = (equipment ?: "body weight").lowercase(),
-        gifUrl = if (!images.isNullOrEmpty()) {
-            val imagePath = images[0]
-            val url = "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/$imagePath"
-            url
-        } else {
-            gifUrl?.replace("http://", "https://") ?: ""
-        },
+        // WorkoutX API ya devuelve gifUrl directamente con URL HTTPS
+        gifUrl = gifUrl?.replace("http://", "https://") ?: "",
         target = target ?: "General",
         secondaryMuscles = secondaryMuscles ?: emptyList(),
         instructions = when (instructions) {
@@ -280,7 +287,9 @@ class FitnessRepository @Inject constructor(
             "waist" -> "#FF4BEB"
             "cardio" -> "#FF4B4B"
             else -> "#00D4FF"
-        }
+        },
+        createdAt = timestamp,
+        updatedAt = timestamp
     )
 
     private fun androidx.compose.ui.graphics.Color.toArgb(): Int {

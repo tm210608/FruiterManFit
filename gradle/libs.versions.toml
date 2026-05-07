@@ -15,6 +15,7 @@ retrofit = "2.9.0"
 okhttp = "4.11.0"
 coil = "2.5.0"
 lottie = "6.7.1"
+bcrypt = "0.4"
 ksp = "1.9.24-1.0.20"
 
 [libraries]
@@ -44,6 +45,7 @@ okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor",
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 coil-gif = { group = "io.coil-kt", name = "coil-gif", version.ref = "coil" }
 lottie = { group = "com.airbnb.android", name = "lottie-compose", version.ref = "lottie" }
+bcrypt = { group = "org.mindrot", name = "jbcrypt", version.ref = "bcrypt" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
