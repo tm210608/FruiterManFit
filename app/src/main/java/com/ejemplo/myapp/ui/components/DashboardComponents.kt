@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.window.Dialog
 import kotlinx.coroutines.delay
 
+import androidx.compose.animation.core.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ejemplo.myapp.R
@@ -59,10 +61,10 @@ fun StatCard(
 ) {
     Card(
         modifier = modifier.height(140.dp),
-        shape = RoundedCornerShape(28.dp),
+        shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = containerColor),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.05f))
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = BorderStroke(1.dp, if (containerColor == BrightLime) Color.Transparent else Color.White.copy(alpha = 0.1f))
     ) {
         Column(
             modifier = Modifier
@@ -125,9 +127,10 @@ fun FeaturedWorkoutCard(
             .fillMaxWidth()
             .height(220.dp)
             .clickable { onLaunch() },
-        shape = RoundedCornerShape(32.dp),
+        shape = RoundedCornerShape(28.dp),
         colors = CardDefaults.cardColors(containerColor = Surface),
-        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.1f))
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.1f)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             // High contrast decorative element
@@ -221,9 +224,10 @@ fun VolumeChart(weeklyVolume: List<Double>) {
         modifier = Modifier
             .fillMaxWidth()
             .height(200.dp),
-        shape = RoundedCornerShape(32.dp),
+        shape = RoundedCornerShape(28.dp),
         colors = CardDefaults.cardColors(containerColor = Surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.1f))
     ) {
         Column(modifier = Modifier.padding(24.dp)) {
             Text(
@@ -278,10 +282,10 @@ fun ActivityItem(title: String, time: String, icon: ImageVector, color: Color, o
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() },
-        shape = RoundedCornerShape(24.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = Surface),
-        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.05f)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.1f)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Row(
             modifier = Modifier
@@ -325,6 +329,7 @@ fun ChallengeItem(challenge: FruitChallenge, onClaim: (String) -> Unit = {}) {
         else -> Icons.Default.FitnessCenter
     }
     
+    val isReadyToClaim = challenge.isCompleted && !challenge.isClaimed
     val color = if (challenge.isCompleted) BrightLime else BrightBlue
     var showAnimation by remember { mutableStateOf(value = false) }
 
@@ -334,13 +339,51 @@ fun ChallengeItem(challenge: FruitChallenge, onClaim: (String) -> Unit = {}) {
             showAnimation = false
         }
         Dialog(onDismissRequest = { showAnimation = false }) {
-            Surface(shape = RoundedCornerShape(24.dp), color = Surface, modifier = Modifier.padding(16.dp)) {
-                Box(modifier = Modifier.size(200.dp), contentAlignment = Alignment.Center) {
-                    Text("¡Reto Reclamado!", fontWeight = FontWeight.Black, fontSize = 20.sp, color = BrightLime)
+            Surface(
+                shape = RoundedCornerShape(32.dp), 
+                color = Surface, 
+                modifier = Modifier.padding(16.dp),
+                border = BorderStroke(2.dp, BrightLime)
+            ) {
+                Column(
+                    modifier = Modifier.padding(32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        Icons.Default.EmojiEvents, 
+                        contentDescription = null, 
+                        tint = BrightLime, 
+                        modifier = Modifier.size(64.dp)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        stringResource(R.string.challenge_completed_title), 
+                        fontWeight = FontWeight.Black, 
+                        fontSize = 20.sp, 
+                        color = BrightLime,
+                        textAlign = TextAlign.Center
+                    )
+                    Text(
+                        stringResource(R.string.challenge_completed_subtitle),
+                        fontSize = 14.sp, 
+                        color = OnSurfaceVariant,
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
         }
     }
+
+    val infiniteTransition = rememberInfiniteTransition(label = "glow")
+    val glowAlpha by infiniteTransition.animateFloat(
+        initialValue = 0.4f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "glowAlpha"
+    )
 
     Row(
         modifier = Modifier
@@ -348,7 +391,10 @@ fun ChallengeItem(challenge: FruitChallenge, onClaim: (String) -> Unit = {}) {
             .clip(RoundedCornerShape(24.dp))
             .background(Surface)
             .border(
-                BorderStroke(1.dp, if (challenge.isCompleted && !challenge.isClaimed) BrightLime.copy(alpha = 0.5f) else Color.Transparent),
+                BorderStroke(
+                    if (isReadyToClaim) 2.dp else 1.dp, 
+                    if (isReadyToClaim) BrightLime.copy(alpha = glowAlpha) else Color.White.copy(alpha = 0.05f)
+                ),
                 RoundedCornerShape(24.dp)
             )
             .padding(16.dp),
@@ -397,7 +443,7 @@ fun ChallengeItem(challenge: FruitChallenge, onClaim: (String) -> Unit = {}) {
             )
         }
         
-        if (challenge.isCompleted && !challenge.isClaimed) {
+        if (isReadyToClaim) {
             Spacer(modifier = Modifier.width(12.dp))
             Button(
                 onClick = { 
@@ -405,11 +451,17 @@ fun ChallengeItem(challenge: FruitChallenge, onClaim: (String) -> Unit = {}) {
                     onClaim(challenge.id) 
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = BrightLime),
-                contentPadding = PaddingValues(horizontal = 12.dp),
-                modifier = Modifier.height(32.dp),
-                shape = RoundedCornerShape(8.dp)
+                contentPadding = PaddingValues(horizontal = 16.dp),
+                modifier = Modifier.height(40.dp),
+                shape = RoundedCornerShape(12.dp),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
             ) {
-                Text(stringResource(R.string.challenge_reward_claim), fontSize = 10.sp, fontWeight = FontWeight.Black, color = Background)
+                Text(
+                    stringResource(R.string.challenge_reward_claim), 
+                    fontSize = 11.sp, 
+                    fontWeight = FontWeight.Black, 
+                    color = Background
+                )
             }
         } else if (challenge.isClaimed) {
             Spacer(modifier = Modifier.width(12.dp))

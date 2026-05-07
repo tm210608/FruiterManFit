@@ -17,23 +17,25 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ejemplo.myapp.data.local.entities.WorkoutSessionEntity
-import com.ejemplo.myapp.data.repository.FitnessRepository
 import com.ejemplo.myapp.ui.theme.*
+import com.ejemplo.myapp.ui.viewmodels.HistoryViewModel
+import com.ejemplo.myapp.R
+import androidx.compose.ui.res.stringResource
 import java.text.SimpleDateFormat
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryScreen(
-    repository: FitnessRepository,
+    viewModel: HistoryViewModel,
     onBack: () -> Unit
 ) {
-    val sessions by repository.getAllSessions().collectAsState(initial = emptyList())
+    val sessions by viewModel.sessions.collectAsState()
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Workout History", fontWeight = FontWeight.Black) },
+                title = { Text(stringResource(R.string.history_title), fontWeight = FontWeight.Black) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -50,7 +52,7 @@ fun HistoryScreen(
     ) { padding ->
         if (sessions.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                Text("No sessions recorded yet", color = OnSurfaceVariant)
+                Text(stringResource(R.string.history_empty), color = OnSurfaceVariant)
             }
         } else {
             LazyColumn(
@@ -71,15 +73,14 @@ fun HistoryItem(session: WorkoutSessionEntity) {
     val dateStr = remember(session.startTime) {
         SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(Date(session.startTime))
     }
-    val durationStr = remember(session.duration) {
-        val mins = session.duration / 60000
-        "${mins}m"
-    }
+    val durationMins = remember(session.duration) { (session.duration / 60000).toInt() }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Surface)
+        shape = RoundedCornerShape(28.dp),
+        colors = CardDefaults.cardColors(containerColor = Surface),
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.1f)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
             modifier = Modifier.padding(20.dp),
@@ -97,14 +98,39 @@ fun HistoryItem(session: WorkoutSessionEntity) {
             Spacer(modifier = Modifier.width(16.dp))
             
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = session.title, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(text = session.title, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = OnSurface)
                 Text(text = dateStr, color = OnSurfaceVariant, fontSize = 12.sp)
             }
             
             Column(horizontalAlignment = Alignment.End) {
-                Text(text = "${session.totalCalories} kcal", fontWeight = FontWeight.Black, fontSize = 16.sp, color = BrightLime)
-                Text(text = durationStr, color = OnSurfaceVariant, fontSize = 12.sp)
+                Text(
+                    text = stringResource(R.string.history_item_calories, session.totalCalories),
+                    fontWeight = FontWeight.Black,
+                    fontSize = 16.sp,
+                    color = BrightLime
+                )
+                Text(
+                    text = stringResource(R.string.history_item_duration, durationMins),
+                    color = OnSurfaceVariant,
+                    fontSize = 12.sp
+                )
             }
         }
+    }
+}
+
+@androidx.compose.ui.tooling.preview.Preview(showBackground = true)
+@Composable
+fun PreviewHistoryItem() {
+    FruiterManTheme {
+        HistoryItem(
+            session = WorkoutSessionEntity(
+                id = 1,
+                title = "CITRUS SHRED",
+                startTime = System.currentTimeMillis(),
+                duration = 2700000,
+                totalCalories = 450
+            )
+        )
     }
 }

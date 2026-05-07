@@ -32,7 +32,11 @@ import com.ejemplo.myapp.data.repository.FitnessRepository
 import androidx.compose.ui.res.stringResource
 import com.ejemplo.myapp.R
 import com.ejemplo.myapp.ui.theme.*
+import com.ejemplo.myapp.ui.utils.ExerciseTranslator
 import com.ejemplo.myapp.ui.utils.translateCategory
+import com.ejemplo.myapp.ui.utils.translateDifficulty
+import com.ejemplo.myapp.ui.utils.translateEquipment
+import com.ejemplo.myapp.ui.utils.translateMuscle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -162,7 +166,7 @@ fun ExerciseDetailScreen(
 
                 // Title & Category
                 Text(
-                    text = ex.name.uppercase(),
+                    text = ExerciseTranslator.translateExerciseName(ex.name).uppercase(),
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Black,
                     color = OnSurface,
@@ -192,7 +196,7 @@ fun ExerciseDetailScreen(
                         border = BorderStroke(1.dp, OnSurfaceVariant.copy(alpha = 0.2f))
                     ) {
                         Text(
-                            text = ex.equipment.uppercase(),
+                            text = translateEquipment(ex.equipment).uppercase(),
                             modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
@@ -215,7 +219,7 @@ fun ExerciseDetailScreen(
                 }
                 
                 Text(
-                    text = stringResource(R.string.detail_target, ex.target.uppercase()),
+                    text = stringResource(R.string.detail_target, translateMuscle(ex.target).uppercase()),
                     color = BrightLime,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
@@ -252,7 +256,7 @@ fun ExerciseDetailScreen(
                         }
                         Spacer(modifier = Modifier.width(16.dp))
                         Text(
-                            text = step,
+                            text = ExerciseTranslator.translateInstruction(step),
                             fontSize = 15.sp,
                             color = OnSurface.copy(alpha = 0.8f),
                             lineHeight = 22.sp
@@ -302,6 +306,7 @@ fun ExerciseDetailScreen(
 
 @Composable
 fun DifficultyBadge(difficulty: String) {
+    val translatedDifficulty = translateDifficulty(difficulty)
     val color = when(difficulty.lowercase()) {
         "beginner" -> Color(0xFF4CAF50)
         "intermediate" -> Color(0xFFFF9800)
@@ -315,7 +320,7 @@ fun DifficultyBadge(difficulty: String) {
         border = BorderStroke(1.dp, color.copy(alpha = 0.5f))
     ) {
         Text(
-            text = difficulty.uppercase(),
+            text = translatedDifficulty.uppercase(),
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
             fontSize = 10.sp,
             fontWeight = FontWeight.Bold,

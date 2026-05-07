@@ -31,6 +31,8 @@ object NetworkModule {
             .addInterceptor { chain ->
                 val request = chain.request().newBuilder()
                     .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36")
+                    // WorkoutX API Key - obtenida de https://workoutxapp.com/dashboard.html
+                    .header("X-WorkoutX-Key", "wx_8cee1ea4a1b2adf0528aeee15048591f7a9192d5f7df3aaf28c4e36d")
                     .build()
                 chain.proceed(request)
             }
@@ -42,8 +44,8 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
-        val baseUrl = "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/dist/"
-        android.util.Log.d("FruiterMan", "Configurando Retrofit con baseUrl: $baseUrl")
+        val baseUrl = "https://api.workoutxapp.com/v1/"
+        android.util.Log.d("FruiterMan", "Configurando Retrofit con WorkoutX API: $baseUrl")
         return Retrofit.Builder()
             .baseUrl(baseUrl)
             .addConverterFactory(GsonConverterFactory.create())

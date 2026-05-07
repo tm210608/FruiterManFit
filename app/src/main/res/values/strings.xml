@@ -106,7 +106,9 @@
     <string name="challenge_apple_desc">Complete 3 chest exercises</string>
     <string name="challenge_banana_title">Banana Boost</string>
     <string name="challenge_banana_desc">Train 3 days in a row</string>
-    <string name="challenge_reward_claim">CLAIM FRUIT</string>
+    <string name="challenge_reward_claim">CLAIM</string>
+    <string name="challenge_completed_title">CHALLENGE COMPLETED!</string>
+    <string name="challenge_completed_subtitle">You have earned a fruit reward</string>
 
     <!-- Auth Screens -->
     <string name="auth_slogan">Get Juicy. Get Fit.</string>
@@ -121,4 +123,10 @@
     <string name="signup_name_label">FULL NAME</string>
     <string name="signup_button">PLANT MY SEED</string>
     <string name="signup_disclaimer">By signing up, you agree to become 100% natural fruit.</string>
+
+    <!-- History Screen -->
+    <string name="history_title">WORKOUT HISTORY</string>
+    <string name="history_empty">No sessions recorded yet. Let\'s go!</string>
+    <string name="history_item_duration">%1$d min</string>
+    <string name="history_item_calories">%1$d kcal</string>
 </resources>

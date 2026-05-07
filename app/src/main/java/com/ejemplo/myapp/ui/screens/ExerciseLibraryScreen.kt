@@ -24,6 +24,7 @@ import coil.request.ImageRequest
 import androidx.compose.ui.res.stringResource
 import com.ejemplo.myapp.R
 import com.ejemplo.myapp.ui.theme.*
+import com.ejemplo.myapp.ui.utils.ExerciseTranslator
 import com.ejemplo.myapp.ui.utils.translateCategory
 import com.ejemplo.myapp.ui.viewmodels.ExerciseLibraryViewModel
 
@@ -97,7 +98,12 @@ fun ExerciseLibraryScreen(
 // ... resto del ModalBottomSheet
                 
                 Spacer(modifier = Modifier.height(16.dp))
-                Text(selectedExercise!!.name.uppercase(), fontWeight = FontWeight.Black, fontSize = 20.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                Text(
+                    text = ExerciseTranslator.translateExerciseName(selectedExercise!!.name).uppercase(),
+                    fontWeight = FontWeight.Black,
+                    fontSize = 20.sp,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
                 Text(translateCategory(selectedExercise!!.bodyPart).uppercase(), color = BrightLime, fontWeight = FontWeight.Bold, fontSize = 12.sp)
                 
                 Spacer(modifier = Modifier.height(32.dp))
@@ -268,7 +274,7 @@ fun ExerciseLibraryScreen(
                         pair.forEach { exercise ->
                             SmallExerciseCard(
                                 modifier = Modifier.weight(1f), 
-                                title = exercise.name, 
+                                title = ExerciseTranslator.translateExerciseName(exercise.name),
                                 category = exercise.bodyPart, 
                                 gifUrl = exercise.gifUrl,
                                 color = exercise.accentColor ?: BrightBlue,

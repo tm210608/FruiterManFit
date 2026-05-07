@@ -71,16 +71,30 @@ fun SectionHeader(title: String, action: String = "", onActionClicked: () -> Uni
             .fillMaxWidth()
             .padding(bottom = 12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.Bottom
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = title,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Black,
-            color = OnSurface,
-            letterSpacing = (-0.5).sp
-        )
-        if (action.isNotEmpty()) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Black,
+                color = OnSurface,
+                letterSpacing = (-0.5).sp
+            )
+            // Si la acción no es un botón (ej: subtítulo de retos), la mostramos debajo con estilo pequeño
+            // Para simplificar, si no hay callback, lo tratamos como subtítulo
+            if (action.isNotEmpty() && onActionClicked == {}) {
+                Text(
+                    text = action.uppercase(),
+                    color = BrightLime,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.sp
+                )
+            }
+        }
+        
+        if (action.isNotEmpty() && onActionClicked != {}) {
             TextButton(onClick = onActionClicked, contentPadding = PaddingValues(0.dp)) {
                 Text(
                     text = action.uppercase(),

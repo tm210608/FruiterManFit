@@ -123,8 +123,9 @@ fun ProfileScreen(
             Card(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp),
                 colors = CardDefaults.cardColors(containerColor = Surface),
-                shape = RoundedCornerShape(32.dp),
-                border = BorderStroke(1.dp, CardStroke)
+                shape = RoundedCornerShape(28.dp),
+                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.1f)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(modifier = Modifier.padding(24.dp)) {
                     Text(
@@ -139,8 +140,71 @@ fun ProfileScreen(
                     )
                 }
             }
-            // Badge section etc.
+            BadgesSection(stats.badges)
             Spacer(modifier = Modifier.height(120.dp))
         }
+    }
+}
+
+@Composable
+fun BadgesSection(badges: List<com.ejemplo.myapp.data.models.Badge>) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        SectionHeader(
+            stringResource(R.string.profile_badge_title),
+            stringResource(R.string.profile_badge_description)
+        )
+        
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            badges.forEach { badge ->
+                BadgeItem(badge, modifier = Modifier.weight(1f))
+            }
+        }
+    }
+}
+
+@Composable
+fun BadgeItem(badge: com.ejemplo.myapp.data.models.Badge, modifier: Modifier = Modifier) {
+    val alpha = if (badge.isUnlocked) 1f else 0.2f
+    val color = if (badge.isUnlocked) BrightLime else OnSurfaceVariant
+    
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(
+            modifier = Modifier
+                .size(64.dp)
+                .background(color.copy(alpha = 0.1f), CircleShape)
+                .border(BorderStroke(1.dp, color.copy(alpha = 0.3f * alpha)), CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = badge.icon as androidx.compose.ui.graphics.vector.ImageVector,
+                contentDescription = null,
+                tint = color.copy(alpha = alpha),
+                modifier = Modifier.size(32.dp)
+            )
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = badge.title,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold,
+            color = if (badge.isUnlocked) OnSurface else OnSurfaceVariant,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+        )
+    }
+}
+
+@androidx.compose.ui.tooling.preview.Preview(showBackground = true)
+@Composable
+fun PreviewProfileScreen() {
+    FruiterManTheme {
+        ProfileScreen(onSettingsClick = {}, onHistoryClick = {})
     }
 }

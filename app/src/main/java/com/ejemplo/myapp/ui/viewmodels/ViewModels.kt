@@ -2,6 +2,7 @@ package com.ejemplo.myapp.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ejemplo.myapp.data.local.entities.WorkoutSessionEntity
 import com.ejemplo.myapp.data.models.*
 import com.ejemplo.myapp.domain.usecase.GetExercisesUseCase
 import com.ejemplo.myapp.data.repository.FitnessRepository
@@ -10,6 +11,18 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+@HiltViewModel
+class HistoryViewModel @Inject constructor(
+    private val repository: FitnessRepository
+) : ViewModel() {
+    val sessions: StateFlow<List<WorkoutSessionEntity>> = repository.getAllSessions()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+}
 
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
