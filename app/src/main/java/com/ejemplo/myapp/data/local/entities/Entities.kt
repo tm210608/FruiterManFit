@@ -72,7 +72,8 @@ data class UserEntity(
     val userUuid: String = java.util.UUID.randomUUID().toString(),
     val name: String,
     val email: String,
-    val password: String, // LEGACY: plaintext stored during v7 and earlier. Migrate to passwordHash on login.
+    // TODO: Remove `password` column in next Room migration (plaintext legacy from v7 and earlier)
+    val password: String,
     val passwordHash: String = "",
     val rank: String,
     val weeklyGoal: Int = 5,

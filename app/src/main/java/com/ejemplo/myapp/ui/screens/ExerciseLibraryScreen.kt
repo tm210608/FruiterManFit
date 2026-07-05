@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import androidx.compose.ui.res.stringResource
+import com.ejemplo.myapp.BuildConfig
 import com.ejemplo.myapp.R
 import com.ejemplo.myapp.ui.theme.*
 import com.ejemplo.myapp.ui.utils.ExerciseTranslator
@@ -44,7 +45,7 @@ fun ExerciseLibraryScreen(
     val sheetState = rememberModalBottomSheetState()
     var showSheet by remember { mutableStateOf(false) }
 
-    val myApiKey = "e039faa7c4msh8c3b03cd185d65dp10ef44jsnc97b003b7753"
+    val myApiKey = BuildConfig.EXERCISE_API_KEY
     
     // USAR EL ImageLoader GLOBAL que soporta GIFs
     val context = LocalContext.current

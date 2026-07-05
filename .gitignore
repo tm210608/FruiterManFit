@@ -7,3 +7,9 @@
 
 # Local Improvement Plan
 IMPROVEMENT_PLAN.md
+
+# Stale HTML files (leftover from development)
+*.html
+
+# Copilot conversation export
+conversacion_copilot.txt

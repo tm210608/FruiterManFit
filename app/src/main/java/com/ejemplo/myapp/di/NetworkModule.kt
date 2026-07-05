@@ -1,5 +1,6 @@
 package com.ejemplo.myapp.di
 
+import com.ejemplo.myapp.BuildConfig
 import com.ejemplo.myapp.data.remote.ExerciseApiService
 import dagger.Module
 import dagger.Provides
@@ -31,8 +32,7 @@ object NetworkModule {
             .addInterceptor { chain ->
                 val request = chain.request().newBuilder()
                     .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36")
-                    // WorkoutX API Key - obtenida de https://workoutxapp.com/dashboard.html
-                    .header("X-WorkoutX-Key", "wx_8cee1ea4a1b2adf0528aeee15048591f7a9192d5f7df3aaf28c4e36d")
+                    .header("X-WorkoutX-Key", BuildConfig.WORKOUT_X_API_KEY)
                     .build()
                 chain.proceed(request)
             }

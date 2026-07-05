@@ -20,6 +20,9 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        buildConfigField("String", "WORKOUT_X_API_KEY", "\"REPLACE_WITH_YOUR_KEY\"")
+        buildConfigField("String", "EXERCISE_API_KEY", "\"REPLACE_WITH_YOUR_KEY\"")
     }
 
     buildTypes {
@@ -39,6 +42,7 @@ android {
         jvmTarget = "1.8"
     }
     buildFeatures {
+        buildConfig = true
         compose = true
     }
     composeOptions {
